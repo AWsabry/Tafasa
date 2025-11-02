@@ -26,6 +26,7 @@ router.get('/users', auth, AuthController.getAllUsers);
 // Current authenticated user
 router.get('/users/me', auth, AuthController.getCurrentUser);
 router.get('/users/:id', auth, AuthController.getUserById);
+router.delete('/users/:id', auth, AuthController.deleteUser);
 
 // Category routes
 router.post('/categories', auth, validateCategory, validate, CategoryController.createCategory);
@@ -35,6 +36,9 @@ router.get('/categories', CategoryController.getAllCategories);
 
 // Get category by ID
 router.get('/categories/:id', CategoryController.getCategoryById);
+
+// Delete category
+router.delete('/categories/:id', auth, CategoryController.deleteCategory);
 
 // Meal routes
 router.post('/meals', auth, validateMeal, validate, MealController.createMeal);
@@ -48,6 +52,9 @@ router.get('/meals/:id', MealController.getMealById);
 // Add ingredient to meal
 router.patch('/meals/:id/ingredients', auth, MealController.addIngredient);
 
+// Update ingredients (PUT - replaces entire ingredients array)
+router.put('/meals/:id/ingredients', auth, MealController.updateIngredients);
+
 // Get meals by category
 router.get('/categories/:categoryId/meals', MealController.getMealsByCategory);
 
@@ -56,5 +63,8 @@ router.get('/meals/recommended', MealController.getRecommendedMeal);
 
 // Recommended meal for a category (random)
 router.get('/categories/:categoryId/recommended', MealController.getRecommendedMealByCategory);
+
+// Delete meal
+router.delete('/meals/:id', auth, MealController.deleteMeal);
 
 export default router;

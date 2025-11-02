@@ -38,6 +38,22 @@ class CategoryController {
             res.status(404).json({ error: error.message });
         }
     }
+
+    static async deleteCategory(req, res) {
+        try {
+            const { id } = req.params;
+            const result = await CategoryService.deleteCategory(id);
+            res.json(result);
+        } catch (error) {
+            if (error.message === 'Category not found') {
+                return res.status(404).json({ error: error.message });
+            }
+            if (error.message.includes('Cannot delete category')) {
+                return res.status(400).json({ error: error.message });
+            }
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 export default CategoryController;

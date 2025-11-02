@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UsersTable = ({ users }) => {
+const UsersTable = ({ users, onDelete }) => {
   return (
     <div className="card overflow-hidden p-0 w-full">
       <div className="overflow-x-auto w-full">
@@ -30,7 +30,13 @@ const UsersTable = ({ users }) => {
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
-                  <button className="btn btn-secondary py-1 px-3">Edit</button>
+                  <button className="btn btn-secondary py-1 px-3 mr-2">Edit</button>
+                  <button 
+                    onClick={() => onDelete && onDelete(user.id)} 
+                    className="btn bg-red-500/10 text-red-400 hover:bg-red-500/20 py-1 px-3"
+                  >
+                    Delete
+                  </button>
                 </td>
               </tr>
             ))}

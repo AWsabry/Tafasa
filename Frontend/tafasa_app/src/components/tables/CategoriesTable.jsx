@@ -1,6 +1,6 @@
 import React from 'react';
 
-const CategoriesTable = ({ categories }) => {
+const CategoriesTable = ({ categories, onDelete }) => {
   return (
     <div className="overflow-x-auto rounded-xl bg-white/5 p-6">
       <table className="min-w-full">
@@ -26,7 +26,12 @@ const CategoriesTable = ({ categories }) => {
               </td>
               <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
                 <button className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2">Edit</button>
-                <button className="rounded bg-red-500/10 px-2 py-1 text-red-400 hover:bg-red-500/20">Delete</button>
+                <button 
+                  onClick={() => onDelete && onDelete(category.id)} 
+                  className="rounded bg-red-500/10 px-2 py-1 text-red-400 hover:bg-red-500/20"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { api } from '../../utils/api';
 
-const MealsTable = ({ meals }) => {
+const MealsTable = ({ meals, onDelete }) => {
   const [showModal, setShowModal] = useState(false);
   const [selectedMeal, setSelectedMeal] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -44,14 +44,27 @@ const MealsTable = ({ meals }) => {
     }
 
     try {
-      const payload = {
+      // Get current ingredients array
+      const currentIngredients = Array.isArray(selectedMeal.ingredients) 
+        ? [...selectedMeal.ingredients] 
+        : [];
+
+      // Create new ingredient object
+      const newIngredient = {
         name: ingredientForm.name.trim(),
-        amount: ingredientForm.amount ? Number(ingredientForm.amount) : undefined,
-        unit: ingredientForm.unit ? ingredientForm.unit.trim() : undefined
+        ...(ingredientForm.amount && { amount: Number(ingredientForm.amount) }),
+        ...(ingredientForm.unit && { unit: ingredientForm.unit.trim() })
       };
 
-      const res = await api.patch(`/meals/${selectedMeal.id}/ingredients`, payload);
-      // update selected meal locally
+      // Add new ingredient to the array
+      const updatedIngredients = [...currentIngredients, newIngredient];
+
+      // Send PUT request with entire ingredients array
+      const res = await api.put(`/meals/${selectedMeal.id}/ingredients`, {
+        ingredients: updatedIngredients
+      });
+
+      // Update selected meal locally
       const updated = res.meal || res;
       setSelectedMeal(normalizeMeal(updated));
       setIngredientForm({ name: '', amount: '', unit: '' });
@@ -114,7 +127,7 @@ const MealsTable = ({ meals }) => {
               </td>
               <td className="whitespace-nowrap py-4 px-3 text-sm text-white">{meal.name}</td>
               <td className="whitespace-nowrap py-4 px-3 text-sm text-white">
-                {meal.category?.name || '-'}
+                {meal.categoryId?.name || meal.category?.name || '-'}
               </td>
               <td className="whitespace-nowrap py-4 px-3 text-sm text-white">
                 ${meal.price.toFixed(2)}
@@ -125,50 +138,145 @@ const MealsTable = ({ meals }) => {
               <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
                 <button onClick={() => openMealDetails(meal.id)} className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2">View</button>
                 <button className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2">Edit</button>
-                <button className="rounded bg-red-500/10 px-2 py-1 text-red-400 hover:bg-red-500/20">Delete</button>
+                <button 
+                  onClick={() => onDelete && onDelete(meal.id)} 
+                  className="rounded bg-red-500/10 px-2 py-1 text-red-400 hover:bg-red-500/20"
+                >
+                  Delete
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
       {showModal && selectedMeal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-[var(--color-bg-secondary)] rounded-lg w-full max-w-2xl p-6">
-            <div className="flex justify-between items-start">
-              <h3 className="text-lg font-semibold">{selectedMeal.name}</h3>
-              <button onClick={closeModal} className="text-sm text-[var(--color-text-secondary)]">Close</button>
+        <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
+          <div className="fixed inset-0 bg-black/50" onClick={closeModal}></div>
+          <div className="relative bg-[var(--color-bg-secondary)] rounded-lg w-full max-w-2xl p-6">
+            <div className="flex justify-between items-center border-b border-[var(--color-bg-tertiary)] pb-4">
+              <h3 className="text-xl font-semibold">{selectedMeal.name}</h3>
+              <button 
+                onClick={closeModal} 
+                className="rounded-lg p-2 hover:bg-[var(--color-bg-tertiary)]"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                </svg>
+              </button>
             </div>
             {detailLoading ? (
               <div className="py-6 text-center">Loading...</div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                <div>
-                  <img src={selectedMeal.image} alt={selectedMeal.name} className="w-full h-48 object-cover rounded" />
-                  <p className="mt-3 text-sm text-[var(--color-text-secondary)]">{selectedMeal.description}</p>
-                  <p className="mt-2 font-medium">Price: ${Number(selectedMeal.price).toFixed(2)}</p>
-                  <p className="mt-1 text-sm">Category: {selectedMeal.category?.name || '-'}</p>
-                </div>
-                <div>
-                  <h4 className="font-semibold">Ingredients</h4>
-                  <ul className="mt-2 space-y-1 max-h-40 overflow-auto">
-                    {(selectedMeal.ingredients || []).map((ing, i) => (
-                      <li key={i} className="text-sm">{ing.name}{ing.amount ? ` — ${ing.amount}` : ''}{ing.unit ? ` ${ing.unit}` : ''}</li>
-                    ))}
-                  </ul>
+              <div className="space-y-6 mt-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <div className="aspect-video relative rounded-lg overflow-hidden bg-[var(--color-bg-tertiary)]">
+                      {selectedMeal.image ? (
+                        <img src={selectedMeal.image} alt={selectedMeal.name} className="w-full h-full object-cover" />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-[var(--color-text-secondary)]">No image</div>
+                      )}
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      <p className="text-sm text-[var(--color-text-secondary)]">{selectedMeal.description}</p>
+                      <p className="font-medium">Price: ${Number(selectedMeal.price).toFixed(2)}</p>
+                      {selectedMeal.categoryId && (
+                        <div className="mt-3 p-3 rounded-lg bg-[var(--color-bg-tertiary)] space-y-2">
+                          <h4 className="font-semibold text-sm mb-2">Category Information</h4>
+                          <p className="text-sm">
+                            <span className="text-[var(--color-text-secondary)]">ID:</span>{' '}
+                            <span className="font-medium">{selectedMeal.categoryId.id}</span>
+                          </p>
+                          <p className="text-sm">
+                            <span className="text-[var(--color-text-secondary)]">Name:</span>{' '}
+                            <span className="font-medium">{selectedMeal.categoryId.name}</span>
+                          </p>
+                          {selectedMeal.categoryId.description && (
+                            <p className="text-sm">
+                              <span className="text-[var(--color-text-secondary)]">Description:</span>{' '}
+                              <span>{selectedMeal.categoryId.description}</span>
+                            </p>
+                          )}
+                        </div>
+                      )}
+                      {!selectedMeal.categoryId && (
+                        <p className="text-sm">Category: {selectedMeal.category?.name || '-'}</p>
+                      )}
+                    </div>
+                  </div>
 
-                  <form onSubmit={handleAddIngredient} className="mt-4 space-y-2">
-                    <h5 className="font-medium">Add Ingredient</h5>
-                    {actionError && <div className="text-sm text-[var(--color-accent-red)]">{actionError}</div>}
-                    <div className="grid grid-cols-3 gap-2">
-                      <input name="name" value={ingredientForm.name} onChange={handleIngredientChange} placeholder="Name" className="input" />
-                      <input name="amount" value={ingredientForm.amount} onChange={handleIngredientChange} placeholder="Amount" className="input" />
-                      <input name="unit" value={ingredientForm.unit} onChange={handleIngredientChange} placeholder="Unit" className="input" />
+                  <div className="space-y-6">
+                    <div>
+                      <h4 className="font-semibold mb-2">Ingredients</h4>
+                      <ul className="space-y-1 max-h-[120px] overflow-y-auto rounded-lg bg-[var(--color-bg-tertiary)] p-3">
+                        {(selectedMeal.ingredients || []).map((ing, i) => (
+                          <li key={i} className="text-sm flex items-center gap-2">
+                            <span className="w-6 h-6 flex items-center justify-center rounded bg-[var(--color-bg-secondary)]">{i + 1}</span>
+                            <span>{ing.name}</span>
+                            {ing.amount && (
+                              <span className="text-[var(--color-text-secondary)]">
+                                {ing.amount} {ing.unit || ''}
+                              </span>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                      <form onSubmit={handleAddIngredient} className="mt-3 space-y-2">
+                        <div className="grid grid-cols-3 gap-2">
+                          <input 
+                            name="name" 
+                            value={ingredientForm.name} 
+                            onChange={handleIngredientChange} 
+                            placeholder="Name" 
+                            className="block w-full rounded bg-[var(--color-bg-tertiary)] px-3 py-1.5 text-sm"
+                          />
+                          <input 
+                            name="amount" 
+                            value={ingredientForm.amount} 
+                            onChange={handleIngredientChange} 
+                            placeholder="Amount" 
+                            className="block w-full rounded bg-[var(--color-bg-tertiary)] px-3 py-1.5 text-sm"
+                          />
+                          <input 
+                            name="unit" 
+                            value={ingredientForm.unit} 
+                            onChange={handleIngredientChange} 
+                            placeholder="Unit" 
+                            className="block w-full rounded bg-[var(--color-bg-tertiary)] px-3 py-1.5 text-sm"
+                          />
+                        </div>
+                        <div className="flex justify-end">
+                          <button 
+                            type="submit" 
+                            className="rounded bg-[var(--color-primary)] px-3 py-1.5 text-sm font-medium text-white hover:bg-[var(--color-primary-light)]"
+                          >
+                            Add Ingredient
+                          </button>
+                        </div>
+                      </form>
                     </div>
-                    <div className="flex justify-end">
-                      <button type="submit" className="btn btn-primary">Add</button>
+
+                    <div>
+                      <h4 className="font-semibold mb-2">Preparation Steps</h4>
+                      <div className="space-y-2 max-h-[200px] overflow-y-auto rounded-lg bg-[var(--color-bg-tertiary)] p-3">
+                        {(selectedMeal.preparationSteps || []).map((step) => (
+                          <div key={step.step} className="flex gap-3">
+                            <div className="w-6 h-6 flex-shrink-0 rounded-full bg-[var(--color-bg-secondary)] flex items-center justify-center text-sm">
+                              {step.step}
+                            </div>
+                            <p className="text-sm">{step.description}</p>
+                          </div>
+                        ))}
+                      </div>
                     </div>
-                  </form>
+                  </div>
                 </div>
+
+                {actionError && (
+                  <div className="rounded-lg bg-red-500/10 text-red-400 p-3 text-sm">
+                    {actionError}
+                  </div>
+                )}
               </div>
             )}
           </div>

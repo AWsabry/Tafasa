@@ -41,6 +41,30 @@ class CategoryService {
             throw error;
         }
     }
+
+    static async deleteCategory(id) {
+        try {
+            const category = await Category.findByPk(id, {
+                include: [{
+                    model: Meal
+                }]
+            });
+            
+            if (!category) {
+                throw new Error('Category not found');
+            }
+
+            // Check if category has associated meals
+            if (category.Meals && category.Meals.length > 0) {
+                throw new Error('Cannot delete category with associated meals. Please delete or reassign meals first.');
+            }
+
+            await category.destroy();
+            return { message: 'Category deleted successfully' };
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default CategoryService;

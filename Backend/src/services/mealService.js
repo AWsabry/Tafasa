@@ -1,6 +1,34 @@
 import Meal from '../models/Meal.js';
 import Category from '../models/Category.js';
 
+// Helper function to transform meal response: categoryId becomes an object with id, name, description
+const transformMealResponse = (meal) => {
+    if (!meal) return meal;
+    
+    const mealData = meal.toJSON ? meal.toJSON() : meal;
+    const category = mealData.Category || mealData.category;
+    
+    if (category) {
+        mealData.categoryId = {
+            id: category.id,
+            name: category.name,
+            description: category.description || null
+        };
+        // Remove the nested Category object
+        delete mealData.Category;
+        delete mealData.category;
+    }
+    
+    return mealData;
+};
+
+const transformMealsResponse = (meals) => {
+    if (Array.isArray(meals)) {
+        return meals.map(transformMealResponse);
+    }
+    return transformMealResponse(meals);
+};
+
 class MealService {
     static async createMeal(data) {
         try {
@@ -11,7 +39,14 @@ class MealService {
             }
 
             const meal = await Meal.create(data);
-            return meal;
+            // Reload with category to include full category data
+            const mealWithCategory = await Meal.findByPk(meal.id, {
+                include: [{
+                    model: Category,
+                    attributes: ['id', 'name', 'description']
+                }]
+            });
+            return transformMealResponse(mealWithCategory);
         } catch (error) {
             throw error;
         }
@@ -22,10 +57,10 @@ class MealService {
             const meals = await Meal.findAll({
                 include: [{
                     model: Category,
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name', 'description']
                 }]
             });
-            return meals;
+            return transformMealsResponse(meals);
         } catch (error) {
             throw error;
         }
@@ -36,13 +71,13 @@ class MealService {
             const meal = await Meal.findByPk(id, {
                 include: [{
                     model: Category,
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name', 'description']
                 }]
             });
             if (!meal) {
                 throw new Error('Meal not found');
             }
-            return meal;
+            return transformMealResponse(meal);
         } catch (error) {
             throw error;
         }
@@ -54,10 +89,10 @@ class MealService {
                 where: { categoryId },
                 include: [{
                     model: Category,
-                    attributes: ['id', 'name']
+                    attributes: ['id', 'name', 'description']
                 }]
             });
-            return meals;
+            return transformMealsResponse(meals);
         } catch (error) {
             throw error;
         }
@@ -72,12 +107,12 @@ class MealService {
 
             const randomOffset = Math.floor(Math.random() * count);
             const meals = await Meal.findAll({
-                include: [{ model: Category, attributes: ['id', 'name'] }],
+                include: [{ model: Category, attributes: ['id', 'name', 'description'] }],
                 offset: randomOffset,
                 limit: 1
             });
 
-            return meals[0] || null;
+            return meals[0] ? transformMealResponse(meals[0]) : null;
         } catch (error) {
             throw error;
         }
@@ -93,12 +128,12 @@ class MealService {
             const randomOffset = Math.floor(Math.random() * count);
             const meals = await Meal.findAll({
                 where: { categoryId },
-                include: [{ model: Category, attributes: ['id', 'name'] }],
+                include: [{ model: Category, attributes: ['id', 'name', 'description'] }],
                 offset: randomOffset,
                 limit: 1
             });
 
-            return meals[0] || null;
+            return meals[0] ? transformMealResponse(meals[0]) : null;
         } catch (error) {
             throw error;
         }
@@ -118,9 +153,55 @@ class MealService {
             await meal.save();
             // reload with category
             const updated = await Meal.findByPk(id, {
-                include: [{ model: Category, attributes: ['id', 'name'] }]
+                include: [{ model: Category, attributes: ['id', 'name', 'description'] }]
             });
-            return updated;
+            return transformMealResponse(updated);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async updateMealIngredients(id, ingredients) {
+        try {
+            const meal = await Meal.findByPk(id);
+            if (!meal) {
+                throw new Error('Meal not found');
+            }
+
+            // Validate that ingredients is an array
+            if (!Array.isArray(ingredients)) {
+                throw new Error('Ingredients must be an array');
+            }
+
+            // Validate each ingredient
+            ingredients.forEach((ingredient, index) => {
+                if (typeof ingredient !== 'object' || !ingredient.name) {
+                    throw new Error(`Ingredient at index ${index} must be an object with a name property`);
+                }
+            });
+
+            meal.ingredients = ingredients;
+            await meal.save();
+
+            // Reload with category
+            const updated = await Meal.findByPk(id, {
+                include: [{ model: Category, attributes: ['id', 'name', 'description'] }]
+            });
+            return transformMealResponse(updated);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async deleteMeal(id) {
+        try {
+            const meal = await Meal.findByPk(id);
+            if (!meal) {
+                throw new Error('Meal not found');
+            }
+
+            await meal.destroy();
+            return { message: 'Meal deleted successfully' };
         } catch (error) {
             throw error;
         }

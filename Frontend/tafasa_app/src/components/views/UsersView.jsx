@@ -11,31 +11,49 @@ const UsersView = () => {
   const { token } = useAuth();
   const navigate = useNavigate();
 
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const data = await api.get('/users');
+      const list = Array.isArray(data) ? data : (data?.users || []);
+      setUsers(list);
+      setError(null);
+    } catch (err) {
+      const msg = err?.message || 'Failed to load users';
+      if (msg === 'Please authenticate.' || msg.toLowerCase().includes('authenticate') || msg.includes('401')) {
+        navigate('/login');
+        return;
+      }
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     let mounted = true;
-    const fetchUsers = async () => {
-      setLoading(true);
-      try {
-        const data = await api.get('/users');
-        const list = Array.isArray(data) ? data : (data?.users || []);
-        if (mounted) setUsers(list);
-      } catch (err) {
-        const msg = err?.message || 'Failed to load users';
-        if (msg === 'Please authenticate.' || msg.toLowerCase().includes('authenticate') || msg.includes('401')) {
-          navigate('/login');
-          return;
-        }
-        if (mounted) setError(msg);
-      } finally {
-        if (mounted) setLoading(false);
-      }
-    };
-
-    fetchUsers();
+    if (mounted) {
+      fetchUsers();
+    }
     return () => {
       mounted = false;
     };
   }, []);
+
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user?')) {
+      return;
+    }
+
+    try {
+      await api.delete(`/users/${userId}`);
+      // Refresh the users list
+      await fetchUsers();
+    } catch (err) {
+      const msg = err?.message || 'Failed to delete user';
+      alert(msg);
+    }
+  };
 
   if (loading) return (
     <div className="flex items-center justify-center py-12">
@@ -49,7 +67,7 @@ const UsersView = () => {
     </div>
   );
 
-  return <UsersTable users={users} />;
+  return <UsersTable users={users} onDelete={handleDeleteUser} />;
 };
 
 export default UsersView;

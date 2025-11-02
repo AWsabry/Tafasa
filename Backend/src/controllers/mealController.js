@@ -3,7 +3,7 @@ import MealService from '../services/mealService.js';
 class MealController {
     static async createMeal(req, res) {
         try {
-            const { name, description, price, image, categoryId } = req.body;
+            const { name, description, price, image, categoryId, ingredients, preparationSteps } = req.body;
             
             if (!name || !price || !categoryId) {
                 return res.status(400).json({ error: 'Name, price, and category are required' });
@@ -14,7 +14,9 @@ class MealController {
                 description,
                 price,
                 image,
-                categoryId
+                categoryId,
+                ingredients: ingredients || [],
+                preparationSteps: preparationSteps || []
             });
             
             res.status(201).json({
@@ -93,6 +95,48 @@ class MealController {
         } catch (error) {
             if (error.message && error.message.includes('No meals')) {
                 return res.status(404).json({ error: error.message });
+            }
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async deleteMeal(req, res) {
+        try {
+            const { id } = req.params;
+            const result = await MealService.deleteMeal(id);
+            res.json(result);
+        } catch (error) {
+            if (error.message === 'Meal not found') {
+                return res.status(404).json({ error: error.message });
+            }
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async updateIngredients(req, res) {
+        try {
+            const { id } = req.params;
+            const { ingredients } = req.body;
+
+            if (!ingredients) {
+                return res.status(400).json({ error: 'Ingredients array is required' });
+            }
+
+            if (!Array.isArray(ingredients)) {
+                return res.status(400).json({ error: 'Ingredients must be an array' });
+            }
+
+            const updatedMeal = await MealService.updateMealIngredients(id, ingredients);
+            res.json({ 
+                message: 'Ingredients updated successfully', 
+                meal: updatedMeal 
+            });
+        } catch (error) {
+            if (error.message && error.message.includes('not found')) {
+                return res.status(404).json({ error: error.message });
+            }
+            if (error.message && error.message.includes('must be')) {
+                return res.status(400).json({ error: error.message });
             }
             res.status(500).json({ error: error.message });
         }

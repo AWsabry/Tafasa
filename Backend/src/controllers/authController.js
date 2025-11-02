@@ -112,6 +112,19 @@ class AuthController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    static async deleteUser(req, res) {
+        try {
+            const { id } = req.params;
+            const result = await AuthService.deleteUser(id);
+            res.json(result);
+        } catch (error) {
+            if (error.message === 'User not found') {
+                return res.status(404).json({ error: error.message });
+            }
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 export default AuthController;
