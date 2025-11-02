@@ -12,13 +12,22 @@ const Dashboard = () => {
   const [users, setUsers] = useState([]);
   const [categories, setCategories] = useState([]);
   const [meals, setMeals] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const { logout } = useAuth();
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
+  const handleLogout = async () => {
+    try {
+      await api.post('/auth/logout');
+      logout();
+      navigate('/login');
+    } catch (error) {
+      // Even if the server logout fails, we'll still clear local state
+      console.error('Logout error:', error);
+      logout();
+      navigate('/login');
+    }
   };
 
   useEffect(() => {
@@ -26,10 +35,11 @@ const Dashboard = () => {
     const fetchOverview = async () => {
       setLoading(true);
       try {
-        const [uRes, cRes, mRes] = await Promise.all([
+        const [uRes, cRes, mRes, meRes] = await Promise.all([
           api.get('/users'),
           api.get('/categories'),
-          api.get('/meals')
+          api.get('/meals'),
+          api.get('/users/me')
         ]);
 
         if (!mounted) return;
@@ -41,6 +51,10 @@ const Dashboard = () => {
         setUsers(uList);
         setCategories(cList);
         setMeals(mList);
+
+        // meRes may be { message, user } or just a user object
+        const me = meRes?.user || meRes;
+        setCurrentUser(me || null);
       } catch (err) {
         const msg = err?.message || '';
         if (msg === 'Please authenticate.' || msg.toLowerCase().includes('authenticate') || msg.includes('401')) {
@@ -69,7 +83,6 @@ const Dashboard = () => {
                     <p className="text-2xl sm:text-3xl font-bold tracking-tight">
                       {users.length}
                     </p>
-                    <span className="text-[var(--color-secondary)] text-sm font-medium">↑ 12%</span>
                   </div>
                 </div>
                 <div className="w-10 h-10 rounded-lg bg-[var(--color-primary)] bg-opacity-10 flex items-center justify-center">
@@ -85,7 +98,6 @@ const Dashboard = () => {
                     <p className="text-2xl sm:text-3xl font-bold tracking-tight">
                       {categories.length}
                     </p>
-                    <span className="text-[var(--color-secondary)] text-sm font-medium">↑ 8%</span>
                   </div>
                 </div>
                 <div className="w-10 h-10 rounded-lg bg-[var(--color-secondary)] bg-opacity-10 flex items-center justify-center">
@@ -101,7 +113,6 @@ const Dashboard = () => {
                     <p className="text-2xl sm:text-3xl font-bold tracking-tight">
                       {meals.length}
                     </p>
-                    <span className="text-[var(--color-secondary)] text-sm font-medium">↑ 24%</span>
                   </div>
                 </div>
                 <div className="w-10 h-10 rounded-lg bg-[var(--color-accent-yellow)] bg-opacity-10 flex items-center justify-center">
@@ -222,11 +233,17 @@ const Dashboard = () => {
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className="bg-center bg-no-repeat aspect-square bg-cover rounded-full w-10 h-10 ring-2 ring-[var(--color-primary)] ring-offset-2 ring-offset-[var(--color-bg-secondary)]"
-                style={{ backgroundImage: 'url("https://ui-avatars.com/api/?background=random")' }}
+                style={{ backgroundImage: `url("https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser?.username || currentUser?.name || 'U')}&background=random")` }}
               />
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-[var(--color-bg-secondary)] ring-1 ring-black ring-opacity-5">
                   <div className="py-1">
+                    {currentUser && (
+                      <div className="px-4 py-2 text-sm text-[var(--color-text-secondary)] border-b border-[var(--color-bg-tertiary)]">
+                        <div className="font-medium text-[var(--color-text-primary)]">{currentUser.name || currentUser.username}</div>
+                        <div className="text-xs">{currentUser.email}</div>
+                      </div>
+                    )}
                     <button
                       onClick={handleLogout}
                       className="w-full text-left px-4 py-2 text-sm hover:bg-[var(--color-bg-tertiary)] flex items-center gap-2"

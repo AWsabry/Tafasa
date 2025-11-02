@@ -88,6 +88,30 @@ class AuthController {
             res.status(500).json({ error: error.message });
         }
     }
+
+    static async getCurrentUser(req, res) {
+        try {
+            // `auth` middleware attaches the full user instance to req.user
+            const user = req.user;
+            if (!user) return res.status(404).json({ error: 'User not found' });
+
+            // Return only safe fields
+            const safeUser = {
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                phoneNumber: user.phoneNumber,
+                createdAt: user.createdAt
+            };
+
+            res.json({
+                message: 'Current user retrieved successfully',
+                user: safeUser
+            });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
 }
 
 export default AuthController;

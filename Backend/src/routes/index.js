@@ -23,6 +23,8 @@ router.post('/auth/logout', auth, AuthController.logout);
 
 // User routes (protected by auth)
 router.get('/users', auth, AuthController.getAllUsers);
+// Current authenticated user
+router.get('/users/me', auth, AuthController.getCurrentUser);
 router.get('/users/:id', auth, AuthController.getUserById);
 
 // Category routes
