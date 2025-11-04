@@ -8,7 +8,8 @@ const RegisterView = () => {
     username: '',
     email: '',
     password: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    age: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -53,7 +54,12 @@ const RegisterView = () => {
 
     setLoading(true);
     try {
-      const response = await api.post('/auth/register', formData);
+      // Prepare form data - convert empty age to null
+      const submitData = {
+        ...formData,
+        age: formData.age ? Number(formData.age) : undefined
+      };
+      const response = await api.post('/auth/register', submitData);
       login(response.token);
       navigate('/dashboard');
     } catch (err) {
@@ -118,6 +124,19 @@ const RegisterView = () => {
               className="input w-full"
               required
               placeholder="Enter your phone number"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1">Age (optional)</label>
+            <input
+              type="number"
+              name="age"
+              value={formData.age}
+              onChange={handleChange}
+              className="input w-full"
+              min="1"
+              max="150"
+              placeholder="Enter your age"
             />
           </div>
           <button

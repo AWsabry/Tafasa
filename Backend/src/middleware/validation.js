@@ -22,6 +22,10 @@ export const validateRegistration = [
         .trim()
         .matches(/^\+?[1-9]\d{1,14}$/)
         .withMessage('Please enter a valid international phone number format'),
+    body('age')
+        .optional()
+        .isInt({ min: 1, max: 150 })
+        .withMessage('Age must be between 1 and 150'),
 ];
 
 export const validateMeal = [

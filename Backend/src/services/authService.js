@@ -3,7 +3,7 @@ import { Op } from 'sequelize';
 import User from '../models/User.js';
 
 class AuthService {
-    static async register(username, email, password, phoneNumber) {
+    static async register(username, email, password, phoneNumber, age) {
         try {
             const existingUser = await User.findOne({ 
                 where: {
@@ -31,7 +31,8 @@ class AuthService {
                 username,
                 email,
                 password,
-                phoneNumber
+                phoneNumber,
+                age
             });
             
             const token = this.generateToken(user.id);
@@ -71,7 +72,7 @@ class AuthService {
     static async getAllUsers() {
         try {
             const users = await User.findAll({
-                attributes: ['id', 'username', 'email', 'phoneNumber', 'createdAt'],
+                attributes: ['id', 'username', 'email', 'phoneNumber', 'age', 'createdAt'],
                 order: [['createdAt', 'DESC']]
             });
             return users;
@@ -83,7 +84,7 @@ class AuthService {
     static async getUserById(id) {
         try {
             const user = await User.findByPk(id, {
-                attributes: ['id', 'username', 'email', 'phoneNumber', 'createdAt']
+                attributes: ['id', 'username', 'email', 'phoneNumber', 'age', 'createdAt']
             });
             
             if (!user) {

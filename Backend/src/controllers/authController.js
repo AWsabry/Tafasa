@@ -3,13 +3,13 @@ import AuthService from '../services/authService.js';
 class AuthController {
     static async register(req, res) {
         try {
-            const { username, email, password, phoneNumber } = req.body;
+            const { username, email, password, phoneNumber, age } = req.body;
             
             if (!username || !email || !password) {
                 return res.status(400).json({ error: 'Username, email, and password are required' });
             }
 
-            const { user, token } = await AuthService.register(username, email, password, phoneNumber);
+            const { user, token } = await AuthService.register(username, email, password, phoneNumber, age);
             
             res.status(201).json({
                 message: 'User registered successfully',
@@ -17,7 +17,8 @@ class AuthController {
                     id: user.id,
                     username: user.username,
                     email: user.email,
-                    phoneNumber: user.phoneNumber
+                    phoneNumber: user.phoneNumber,
+                    age: user.age
                 },
                 token
             });
@@ -42,7 +43,8 @@ class AuthController {
                     id: user.id,
                     username: user.username,
                     email: user.email,
-                    phoneNumber: user.phoneNumber
+                    phoneNumber: user.phoneNumber,
+                    age: user.age
                 },
                 token
             });
@@ -101,6 +103,7 @@ class AuthController {
                 username: user.username,
                 email: user.email,
                 phoneNumber: user.phoneNumber,
+                age: user.age,
                 createdAt: user.createdAt
             };
 

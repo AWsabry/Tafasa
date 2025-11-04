@@ -30,6 +30,14 @@ User.init({
             is: /^\+?[1-9]\d{1,14}$/, // Validates international phone number format
         }
     },
+    age: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        validate: {
+            min: 1,
+            max: 150
+        }
+    },
     email: {
         type: DataTypes.STRING,
         allowNull: false,

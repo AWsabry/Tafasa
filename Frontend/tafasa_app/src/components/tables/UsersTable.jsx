@@ -11,6 +11,7 @@ const UsersTable = ({ users, onDelete }) => {
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Username</th>
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Email</th>
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Phone</th>
+              <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Age</th>
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Created At</th>
               <th className="py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-[var(--color-text-secondary)]">Actions</th>
             </tr>
@@ -26,6 +27,7 @@ const UsersTable = ({ users, onDelete }) => {
                 <td className="whitespace-nowrap py-4 px-3 text-sm font-medium">{user.username}</td>
                 <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">{user.email}</td>
                 <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">{user.phoneNumber || '-'}</td>
+                <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">{user.age || '-'}</td>
                 <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
