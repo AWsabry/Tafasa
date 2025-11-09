@@ -4,6 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import UsersView from './views/UsersView';
 import CategoriesView from './views/CategoriesView';
 import MealsView from './views/MealsView';
+import FavoritesView from './views/FavoritesView';
 import { api } from '../utils/api';
 
 const Dashboard = () => {
@@ -171,6 +172,8 @@ const Dashboard = () => {
         return <CategoriesView />;
       case 'meals':
         return <MealsView />;
+      case 'favorites':
+        return <FavoritesView />;
       default:
         return null;
     }
@@ -221,6 +224,14 @@ const Dashboard = () => {
                 }`}
               >
                 Meals
+              </button>
+              <button
+                onClick={() => setActiveTab('favorites')}
+                className={`text-sm font-medium leading-normal transition-colors hover:text-[var(--color-primary-light)] ${
+                  activeTab === 'favorites' ? 'text-[var(--color-primary)]' : 'text-[var(--color-text-secondary)]'
+                }`}
+              >
+                Favorites
               </button>
             </nav>
             {/* Mobile menu button */}

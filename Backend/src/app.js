@@ -1,13 +1,14 @@
-import express from 'express';
-import dotenv from 'dotenv';
 import cors from 'cors';
-import morgan from 'morgan';
+import dotenv from 'dotenv';
+import express from 'express';
 import helmet from 'helmet';
-import routes from './routes/index.js';
+import morgan from 'morgan';
 import sequelize from './config/database.js';
-import './models/User.js';
 import './models/Category.js';
 import './models/Meal.js';
+import './models/User.js';
+import './models/Favorite.js';
+import routes from './routes/index.js';
 
 dotenv.config();
 
@@ -37,4 +38,7 @@ sequelize.sync()
 app.use('/', routes);
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on port ${PORT}`);
+});

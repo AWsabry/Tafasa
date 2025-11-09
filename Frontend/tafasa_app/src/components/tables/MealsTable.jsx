@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { api } from '../../utils/api';
+import { api, favoritesApi } from '../../utils/api';
 
 const MealsTable = ({ meals, onDelete }) => {
   const [showModal, setShowModal] = useState(false);
@@ -7,6 +7,7 @@ const MealsTable = ({ meals, onDelete }) => {
   const [detailLoading, setDetailLoading] = useState(false);
   const [ingredientForm, setIngredientForm] = useState({ name: '', amount: '', unit: '' });
   const [actionError, setActionError] = useState(null);
+  const [addingToFavorites, setAddingToFavorites] = useState(null);
 
   const openMealDetails = async (mealId) => {
     setActionError(null);
@@ -45,8 +46,8 @@ const MealsTable = ({ meals, onDelete }) => {
 
     try {
       // Get current ingredients array
-      const currentIngredients = Array.isArray(selectedMeal.ingredients) 
-        ? [...selectedMeal.ingredients] 
+      const currentIngredients = Array.isArray(selectedMeal.ingredients)
+        ? [...selectedMeal.ingredients]
         : [];
 
       // Create new ingredient object
@@ -70,6 +71,19 @@ const MealsTable = ({ meals, onDelete }) => {
       setIngredientForm({ name: '', amount: '', unit: '' });
     } catch (err) {
       setActionError(err.message || 'Failed to add ingredient');
+    }
+  };
+
+  const handleAddToFavorites = async (mealId) => {
+    setAddingToFavorites(mealId);
+    try {
+      await favoritesApi.addFavorite(mealId);
+      alert('Meal added to favorites!');
+    } catch (err) {
+      const msg = err?.message || 'Failed to add to favorites';
+      alert(msg);
+    } finally {
+      setAddingToFavorites(null);
     }
   };
 
@@ -98,57 +112,75 @@ const MealsTable = ({ meals, onDelete }) => {
   }
   return (
     <div className="overflow-x-auto rounded-xl bg-white/5 p-6">
-      <table className="min-w-full">
-        <thead>
-          <tr className="border-b border-white/10">
-            <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white/60">ID</th>
-            <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Image</th>
-            <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Name</th>
-            <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Category</th>
-            <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Price</th>
-            <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Description</th>
-            <th className="py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-white/60">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {meals?.map((meal) => (
-            <tr key={meal.id} className="border-b border-white/5">
-              <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-white">{meal.id}</td>
-              <td className="whitespace-nowrap py-4 px-3 text-sm">
-                {meal.image ? (
-                  <img 
-                    src={meal.image} 
-                    alt={meal.name} 
-                    className="h-10 w-10 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="h-10 w-10 rounded-full bg-white/10"></div>
-                )}
-              </td>
-              <td className="whitespace-nowrap py-4 px-3 text-sm text-white">{meal.name}</td>
-              <td className="whitespace-nowrap py-4 px-3 text-sm text-white">
-                {meal.categoryId?.name || meal.category?.name || '-'}
-              </td>
-              <td className="whitespace-nowrap py-4 px-3 text-sm text-white">
-                ${meal.price.toFixed(2)}
-              </td>
-              <td className="py-4 px-3 text-sm text-white line-clamp-2">
-                {meal.description || '-'}
-              </td>
-              <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
-                <button onClick={() => openMealDetails(meal.id)} className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2">View</button>
-                <button className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2">Edit</button>
-                <button 
-                  onClick={() => onDelete && onDelete(meal.id)} 
-                  className="rounded bg-red-500/10 px-2 py-1 text-red-400 hover:bg-red-500/20"
-                >
-                  Delete
-                </button>
-              </td>
+      {!meals || meals.length === 0 ? (
+        <div className="text-center py-12">
+          <svg className="mx-auto h-12 w-12 text-white/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <h3 className="mt-2 text-sm font-medium text-white">No meals found</h3>
+          <p className="mt-1 text-sm text-white/60">Get started by creating a new meal.</p>
+        </div>
+      ) : (
+        <table className="min-w-full">
+          <thead>
+            <tr className="border-b border-white/10">
+              <th className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-white/60">ID</th>
+              <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Image</th>
+              <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Name</th>
+              <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Category</th>
+              <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Price</th>
+              <th className="py-3.5 px-3 text-left text-sm font-semibold text-white/60">Description</th>
+              <th className="py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-white/60">Actions</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {meals.map((meal) => (
+              <tr key={meal.id} className="border-b border-white/5">
+                <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm text-white">{meal.id}</td>
+                <td className="whitespace-nowrap py-4 px-3 text-sm">
+                  {meal.image ? (
+                    <img
+                      src={meal.image}
+                      alt={meal.name}
+                      className="h-10 w-10 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="h-10 w-10 rounded-full bg-white/10"></div>
+                  )}
+                </td>
+                <td className="whitespace-nowrap py-4 px-3 text-sm text-white">{meal.name}</td>
+                <td className="whitespace-nowrap py-4 px-3 text-sm text-white">
+                  {meal.categoryId?.name || meal.category?.name || '-'}
+                </td>
+                <td className="whitespace-nowrap py-4 px-3 text-sm text-white">
+                  ${meal.price.toFixed(2)}
+                </td>
+                <td className="py-4 px-3 text-sm text-white line-clamp-2">
+                  {meal.description || '-'}
+                </td>
+                <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
+                  <button
+                    onClick={() => handleAddToFavorites(meal.id)}
+                    disabled={addingToFavorites === meal.id}
+                    className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2 disabled:opacity-50"
+                    title="Add to favorites"
+                  >
+                    {addingToFavorites === meal.id ? '...' : '♥'}
+                  </button>
+                  <button onClick={() => openMealDetails(meal.id)} className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2">View</button>
+                  <button className="rounded bg-white/5 px-2 py-1 text-white hover:bg-white/10 mr-2">Edit</button>
+                  <button
+                    onClick={() => onDelete && onDelete(meal.id)}
+                    className="rounded bg-red-500/10 px-2 py-1 text-red-400 hover:bg-red-500/20"
+                  >
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {showModal && selectedMeal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto p-4">
           <div className="fixed inset-0 bg-black/50" onClick={closeModal}></div>

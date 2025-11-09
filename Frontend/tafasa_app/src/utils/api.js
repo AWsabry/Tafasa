@@ -11,7 +11,7 @@ export const api = {
       : {};
 
     const response = await fetch(`${API_BASE_URL}${endpoint}`, { headers });
-    
+
     if (!response.ok) {
       if (response.status === 401 && !PUBLIC_ENDPOINTS.includes(endpoint)) {
         localStorage.removeItem('token');
@@ -19,7 +19,7 @@ export const api = {
       const errorData = await response.json();
       throw new Error(errorData.error || `HTTP ${response.status}`);
     }
-    
+
     return response.json();
   },
 
@@ -95,7 +95,7 @@ export const api = {
         try {
           const text = await response.text();
           if (text) errorMessage = text;
-        } catch (_) {}
+        } catch (_) { }
       }
 
       throw new Error(errorMessage || `HTTP ${response.status}`);
@@ -134,7 +134,7 @@ export const api = {
         try {
           const text = await response.text();
           if (text) errorMessage = text;
-        } catch (_) {}
+        } catch (_) { }
       }
 
       throw new Error(errorMessage || `HTTP ${response.status}`);
@@ -171,12 +171,27 @@ export const api = {
         try {
           const text = await response.text();
           if (text) errorMessage = text;
-        } catch (_) {}
+        } catch (_) { }
       }
 
       throw new Error(errorMessage || `HTTP ${response.status}`);
     }
 
     return response.json();
+  },
+};
+
+// Favorites API
+export const favoritesApi = {
+  addFavorite: async (mealId) => {
+    return api.post('/favorites', { mealId });
+  },
+
+  removeFavorite: async (mealId) => {
+    return api.delete(`/favorites/${mealId}`);
+  },
+
+  getAllFavorites: async () => {
+    return api.get('/favorites');
   },
 };
