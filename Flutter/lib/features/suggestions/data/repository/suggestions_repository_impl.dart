@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:food_gpt/core/error/failure.dart';
-import 'package:food_gpt/core/managers/failure_handler.dart';
-import 'package:food_gpt/core/utils/logger.dart';
-import 'package:food_gpt/features/suggestions/data/datasource/suggestions_datasource.dart';
-import 'package:food_gpt/features/suggestions/data/model/recipe_model.dart';
-import 'package:food_gpt/features/suggestions/domain/repository/suggestions_repository.dart';
+import 'package:tafasa/core/error/failure.dart';
+import 'package:tafasa/core/managers/failure_handler.dart';
+import 'package:tafasa/core/utils/logger.dart';
+import 'package:tafasa/features/suggestions/data/datasource/suggestions_datasource.dart';
+import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
+import 'package:tafasa/features/suggestions/domain/repository/suggestions_repository.dart';
 
 class SuggestionsRepositoryImpl implements SuggestionsRepository {
   final SuggestionsDatasource _datasource;

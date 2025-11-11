@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/features/favorites/domain/repository/favorites_repository.dart';
-import 'package:food_gpt/features/suggestions/data/model/recipe_model.dart';
+import 'package:tafasa/features/favorites/domain/repository/favorites_repository.dart';
+import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
 
 part 'favorites_state.dart';
 
@@ -24,15 +24,13 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     final currentState = state;
     if (currentState is FavoritesLoaded) {
       final result = await _favoritesRepository.removeFavorite(mealId);
-      result.fold(
-        (failure) => emit(FavoritesError(failure.message)),
-        (_) {
-          final updatedFavorites = currentState.favorites
-              .where((meal) => meal.id != mealId)
-              .toList();
-          emit(FavoritesLoaded(updatedFavorites));
-        },
-      );
+      result.fold((failure) => emit(FavoritesError(failure.message)), (_) {
+        final updatedFavorites = currentState.favorites
+            .where((meal) => meal.mealId != mealId)
+            .toList();
+        emit(FavoritesLoaded(updatedFavorites));
+        emit(RemoveFavorite());
+      });
     }
   }
 

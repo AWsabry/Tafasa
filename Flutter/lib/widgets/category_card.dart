@@ -41,21 +41,39 @@ class _CategoryCardState extends State<CategoryCard>
   Color getColorForCategory() {
     switch (widget.category) {
       case 'فطور':
-        return const Color(0xFFFF6B35);
+        return Colors.orange;
       case 'غداء':
-        return const Color(0xFFE63946);
+        return Colors.red;
       case 'عشاء':
-        return const Color(0xFF6A4C93);
+        return Colors.purple;
       case 'تحلية':
-        return const Color(0xFFEC4899);
+        return Colors.pink;
       case 'سناكس':
-        return const Color(0xFFF59E0B);
+        return Colors.amber;
       case 'صحي':
-        return const Color(0xFF10B981);
+        return Colors.green;
       default:
-        return const Color(0xFFEC4899);
+        return Colors.pinkAccent;
     }
   }
+
+  // Color getColorForCategory() {
+  //   // Alternate between purple and orange for variety
+  //   final categoryIndex = [
+  //     'فطور',
+  //     'غداء',
+  //     'عشاء',
+  //     'تحلية',
+  //     'سناكس',
+  //     'صحي',
+  //   ].indexOf(widget.category);
+
+  //   if (categoryIndex == -1 || categoryIndex % 2 == 0) {
+  //     return AppTheme.primaryPurple;
+  //   } else {
+  //     return AppTheme.primaryOrange;
+  //   }
+  // }
 
   @override
   void initState() {
@@ -205,6 +223,7 @@ class _CategoryCardState extends State<CategoryCard>
                           widget.category,
                           textAlign: TextAlign.center,
                           style: const TextStyle(
+                            fontFamily: 'FFKhallab',
                             color: Colors.white,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,

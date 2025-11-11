@@ -2,11 +2,13 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/core/services/locator/service_locator.dart';
-import 'package:food_gpt/core/utils/logger.dart';
-import 'package:food_gpt/features/home/data/model/categories_model.dart';
-import 'package:food_gpt/features/suggestions/presentation/controller/suggestions_cubit.dart';
-import 'package:food_gpt/features/suggestions/presentation/view/suggestions_screen.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:tafasa/core/services/locator/service_locator.dart';
+import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/core/utils/logger.dart';
+import 'package:tafasa/features/home/data/model/categories_model.dart';
+import 'package:tafasa/features/suggestions/presentation/controller/suggestions_cubit.dart';
+import 'package:tafasa/features/suggestions/presentation/view/suggestions_screen.dart';
 
 import '../../../../widgets/category_card.dart';
 import '../../../favorites/presentation/view/favorites_screen.dart';
@@ -108,7 +110,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
           PageRouteBuilder(
             pageBuilder: (_, __, ___) => BlocProvider(
               create: (context) => sl<SuggestionsCubit>(param1: category.id),
-              child: const SuggestionScreen(),
+              child: SuggestionScreen(category: category),
             ),
             transitionDuration: const Duration(milliseconds: 600),
             transitionsBuilder: (_, animation, __, child) {
@@ -178,9 +180,8 @@ class _HomeScreenViewState extends State<_HomeScreenView>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                const Color(0xFF1a1a2e),
-                const Color(0xFF16213e),
-                const Color(0xFF0f3460),
+                AppTheme.primaryPurple.withOpacity(0.50),
+                AppTheme.primaryOrange.withOpacity(0.40),
               ],
             ),
           ),
@@ -188,26 +189,41 @@ class _HomeScreenViewState extends State<_HomeScreenView>
             child: Stack(
               children: [
                 // Floating particles
-                _buildFloatingParticle(50, 120, 0, Colors.pink.shade300),
+                _buildFloatingParticle(
+                  50,
+                  120,
+                  0,
+                  AppTheme.primaryPurple.withOpacity(0.5),
+                ),
                 _buildFloatingParticle(
                   screenWidth - 70,
                   180,
                   0.2,
-                  Colors.orange.shade300,
+                  AppTheme.primaryOrange.withOpacity(0.5),
                 ),
-                _buildFloatingParticle(60, 320, 0.4, Colors.purple.shade300),
+                _buildFloatingParticle(
+                  60,
+                  320,
+                  0.4,
+                  AppTheme.primaryPurple.withOpacity(0.4),
+                ),
                 _buildFloatingParticle(
                   screenWidth - 80,
                   420,
                   0.6,
-                  Colors.amber.shade300,
+                  AppTheme.primaryOrange.withOpacity(0.6),
                 ),
-                _buildFloatingParticle(70, 550, 0.8, Colors.teal.shade300),
+                _buildFloatingParticle(
+                  70,
+                  550,
+                  0.8,
+                  AppTheme.primaryPurple.withOpacity(0.3),
+                ),
                 _buildFloatingParticle(
                   screenWidth - 60,
                   680,
                   0.3,
-                  Colors.pink.shade400,
+                  AppTheme.primaryOrange.withOpacity(0.4),
                 ),
 
                 Column(
@@ -239,24 +255,27 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                   builder: (context, child) {
                                     return Container(
                                       padding: const EdgeInsets.all(12),
+                                      height: 80,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         gradient: LinearGradient(
                                           colors: [
-                                            Colors.pink.shade400.withOpacity(
+                                            AppTheme.primaryPurple.withOpacity(
                                               0.3,
                                             ),
-                                            Colors.orange.shade400.withOpacity(
+                                            AppTheme.primaryOrange.withOpacity(
                                               0.3,
                                             ),
                                           ],
                                         ),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.pink.withOpacity(
-                                              0.2 +
-                                                  _headerController.value * 0.2,
-                                            ),
+                                            color: AppTheme.primaryPurple
+                                                .withOpacity(
+                                                  0.2 +
+                                                      _headerController.value *
+                                                          0.2,
+                                                ),
                                             blurRadius:
                                                 15 +
                                                 _headerController.value * 10,
@@ -264,39 +283,47 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                           ),
                                         ],
                                       ),
-                                      child: Icon(
-                                        Icons.restaurant_menu,
-                                        color: Colors.white,
-                                        size: 28,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/TAFASA WHITE LOGO.svg',
+                                        height: 85,
+                                        width: 75,
+                                        fit: BoxFit.fill,
+                                        colorFilter: const ColorFilter.mode(
+                                          Colors.white,
+                                          BlendMode.srcIn,
+                                        ),
                                       ),
                                     );
                                   },
                                 ),
-                                const SizedBox(width: 14),
-                                ShaderMask(
-                                  shaderCallback: (bounds) => LinearGradient(
-                                    colors: [
-                                      Colors.pink.shade300,
-                                      Colors.orange.shade300,
-                                      Colors.purple.shade300,
-                                    ],
-                                  ).createShader(bounds),
-                                  child: const Text(
-                                    'FoodGPT',
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      fontSize: 28,
-                                      letterSpacing: 2,
-                                    ),
-                                  ),
-                                ),
+
+                                // const SizedBox(width: 14),
+                                // ShaderMask(
+                                //   shaderCallback: (bounds) => LinearGradient(
+                                //     colors: [
+                                //       AppTheme.primaryPurple,
+                                //       AppTheme.primaryOrange,
+                                //       AppTheme.primaryPurple,
+                                //     ],
+                                //   ).createShader(bounds),
+                                //   child: const Text(
+                                //     'Tafasa',
+                                //     style: TextStyle(
+                                //       fontFamily: 'GraphicSchool',
+                                //       fontWeight: FontWeight.bold,
+                                //       color: Colors.white,
+                                //       fontSize: 28,
+                                //       letterSpacing: 2,
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                             const SizedBox(height: 12),
                             Text(
                               'اكتشف وصفات مصرية أصيلة',
                               style: TextStyle(
+                                fontFamily: 'FFKhallab',
                                 color: Colors.white.withOpacity(0.7),
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
@@ -320,13 +347,14 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                 children: [
                                   CircularProgressIndicator(
                                     valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.pink.shade300,
+                                      AppTheme.primaryPurple,
                                     ),
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
                                     'جاري تحميل الفئات...',
                                     style: TextStyle(
+                                      fontFamily: 'FFKhallab',
                                       color: Colors.white.withOpacity(0.7),
                                       fontSize: 16,
                                     ),
@@ -353,6 +381,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                     state.message,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
+                                      fontFamily: 'FFKhallab',
                                       color: Colors.white.withOpacity(0.7),
                                       fontSize: 16,
                                     ),
@@ -363,9 +392,12 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                       context.read<HomeCubit>().getCategories();
                                     },
                                     icon: const Icon(Icons.refresh),
-                                    label: const Text('إعادة المحاولة'),
+                                    label: const Text(
+                                      'إعادة المحاولة',
+                                      style: TextStyle(fontFamily: 'FFKhallab'),
+                                    ),
                                     style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.pink.shade400,
+                                      backgroundColor: AppTheme.primaryPurple,
                                       foregroundColor: Colors.white,
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 24,
@@ -413,7 +445,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                           child: Center(
                             child: CircularProgressIndicator(
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                Colors.pink.shade300,
+                                AppTheme.primaryPurple,
                               ),
                             ),
                           ),
@@ -433,7 +465,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                 : 0;
             return Container(
               decoration: BoxDecoration(
-                color: const Color(0xFF1a1a2e),
+                color: AppTheme.primaryPurple.withOpacity(0.95),
                 border: Border(
                   top: BorderSide(
                     color: Colors.white.withOpacity(0.1),
@@ -554,14 +586,14 @@ class _HomeScreenViewState extends State<_HomeScreenView>
         decoration: BoxDecoration(
           gradient: isSelected
               ? LinearGradient(
-                  colors: [Colors.pink.shade400, Colors.orange.shade400],
+                  colors: [AppTheme.primaryPurple, AppTheme.primaryOrange],
                 )
               : null,
           borderRadius: BorderRadius.circular(20),
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Colors.pink.withOpacity(0.3),
+                    color: AppTheme.primaryPurple.withOpacity(0.3),
                     blurRadius: 15,
                     offset: const Offset(0, 4),
                   ),
@@ -581,6 +613,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
               Text(
                 label,
                 style: const TextStyle(
+                  fontFamily: 'FFKhallab',
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,

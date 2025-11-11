@@ -1,5 +1,5 @@
 // register_state.dart
-import 'package:food_gpt/core/error/failure.dart';
+import 'package:tafasa/core/error/failure.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'register_state.freezed.dart';

@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/features/suggestions/data/model/recipe_model.dart';
-import 'package:food_gpt/features/suggestions/domain/repository/suggestions_repository.dart';
+import 'package:tafasa/core/utils/logger.dart';
+import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
+import 'package:tafasa/features/suggestions/domain/repository/suggestions_repository.dart';
 
 part 'suggestions_state.dart';
 
@@ -12,6 +13,7 @@ class SuggestionsCubit extends Cubit<SuggestionsState> {
   SuggestionsCubit(this._suggestionsRepository, {int? categoryId})
     : _initialCategoryId = categoryId,
       super(const SuggestionsInitial()) {
+    Logger.debug((categoryId ?? null).toString());
     _loadInitialMeal();
   }
 

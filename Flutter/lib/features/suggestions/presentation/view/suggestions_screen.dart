@@ -2,15 +2,18 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/core/services/locator/service_locator.dart';
-import 'package:food_gpt/features/favorites/domain/repository/favorites_repository.dart';
-import 'package:food_gpt/features/favorites/presentation/view/favorites_screen.dart';
-import 'package:food_gpt/features/recipe_detail/presentation/view/recipe_detialed_screen.dart';
-import 'package:food_gpt/features/suggestions/data/model/recipe_model.dart';
-import 'package:food_gpt/features/suggestions/presentation/controller/suggestions_cubit.dart';
+import 'package:tafasa/core/services/locator/service_locator.dart';
+import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/features/favorites/domain/repository/favorites_repository.dart';
+import 'package:tafasa/features/favorites/presentation/view/favorites_screen.dart';
+import 'package:tafasa/features/home/data/model/categories_model.dart';
+import 'package:tafasa/features/recipe_detail/presentation/view/recipe_detialed_screen.dart';
+import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
+import 'package:tafasa/features/suggestions/presentation/controller/suggestions_cubit.dart';
 
 class SuggestionScreen extends StatefulWidget {
-  const SuggestionScreen({super.key});
+  const SuggestionScreen({super.key, this.category});
+  final Category? category;
 
   @override
   State<SuggestionScreen> createState() => _SuggestionScreenState();
@@ -49,8 +52,8 @@ class _SuggestionScreenState extends State<SuggestionScreen>
     super.initState();
 
     // Data will come from Cubit, just initialize animations
-    currentCategory = '';
     currentMeal = {};
+    currentCategory = widget.category?.name ?? '';
 
     _controller = AnimationController(
       vsync: this,
@@ -120,6 +123,11 @@ class _SuggestionScreenState extends State<SuggestionScreen>
         );
 
     _controller.forward();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
   }
 
   void _onHorizontalDragUpdate(DragUpdateDetails details) {
@@ -371,7 +379,11 @@ class _SuggestionScreenState extends State<SuggestionScreen>
           top: top + offset,
           child: Opacity(
             opacity: opacity * 0.4,
-            child: Icon(Icons.favorite, color: Colors.pink.shade300, size: 20),
+            child: Icon(
+              Icons.favorite,
+              color: AppTheme.primaryPurple,
+              size: 20,
+            ),
           ),
         );
       },
@@ -397,7 +409,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
           setState(() {
             currentMeal = state.currentMeal;
             currentCategory = state.currentCategory;
-            _isFavorite = state.isFavorite;
+            _isFavorite = state.recipe?.isFavorite ?? false;
             currentRecipe = state.recipe;
           });
         }
@@ -412,7 +424,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [Colors.pink.shade50, Colors.purple.shade50],
+                    colors: [AppTheme.primaryPurple, Colors.purple.shade50],
                   ),
                 ),
                 child: const Center(child: CircularProgressIndicator()),
@@ -463,7 +475,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                   end: Alignment.bottomRight,
                   colors: [
                     getCategoryColor().withOpacity(0.1),
-                    Colors.pink.shade50,
+                    AppTheme.primaryPurple,
                     Colors.purple.shade50,
                   ],
                 ),
@@ -601,9 +613,10 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                 Text(
                                   'اسحب يميناً أو يساراً لوجبة جديدة',
                                   style: TextStyle(
-                                    fontSize: 13,
-                                    color: getCategoryColor(),
-                                    fontWeight: FontWeight.w500,
+                                    fontSize: 14,
+                                    color: Colors.black,
+                                    fontStyle: FontStyle.italic,
+                                    fontWeight: FontWeight.w900,
                                   ),
                                 ),
                               ],
@@ -1109,10 +1122,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                                               FontWeight.bold,
                                                                         ),
                                                                       ),
-                                                                      SizedBox(
-                                                                        width:
-                                                                            8,
-                                                                      ),
+
                                                                       Icon(
                                                                         Icons
                                                                             .arrow_back_rounded,
@@ -1183,7 +1193,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                                         vertical:
                                                                             14,
                                                                         horizontal:
-                                                                            16,
+                                                                            10,
                                                                       ),
                                                                   child: Row(
                                                                     mainAxisAlignment:
@@ -1200,7 +1210,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                                       ),
                                                                       SizedBox(
                                                                         width:
-                                                                            8,
+                                                                            5,
                                                                       ),
                                                                       Text(
                                                                         'وجبة أخرى',

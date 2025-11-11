@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/features/recipe_detail/domain/repository/recipe_detail_repository.dart';
-import 'package:food_gpt/features/suggestions/data/model/recipe_model.dart';
+import 'package:tafasa/features/recipe_detail/domain/repository/recipe_detail_repository.dart';
+import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
 
 part 'recipe_detail_state.dart';
 

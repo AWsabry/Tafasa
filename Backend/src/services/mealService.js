@@ -1,13 +1,14 @@
 import Meal from '../models/Meal.js';
 import Category from '../models/Category.js';
+import Favorite from '../models/Favorite.js';
 
 // Helper function to transform meal response: categoryId becomes an object with id, name, description
-const transformMealResponse = (meal) => {
+const transformMealResponse = (meal, userId = null) => {
     if (!meal) return meal;
-    
+
     const mealData = meal.toJSON ? meal.toJSON() : meal;
     const category = mealData.Category || mealData.category;
-    
+
     if (category) {
         mealData.categoryId = {
             id: category.id,
@@ -18,15 +19,24 @@ const transformMealResponse = (meal) => {
         delete mealData.Category;
         delete mealData.category;
     }
-    
+
+    // Add isFavorite attribute based on Favorites relation
+    if (userId !== null && mealData.Favorites) {
+        mealData.isFavorite = mealData.Favorites.length > 0;
+        delete mealData.Favorites;
+    } else if (userId === null) {
+        // If no userId provided, set isFavorite to false
+        mealData.isFavorite = false;
+    }
+
     return mealData;
 };
 
-const transformMealsResponse = (meals) => {
+const transformMealsResponse = (meals, userId = null) => {
     if (Array.isArray(meals)) {
-        return meals.map(transformMealResponse);
+        return meals.map(meal => transformMealResponse(meal, userId));
     }
-    return transformMealResponse(meals);
+    return transformMealResponse(meals, userId);
 };
 
 class MealService {
@@ -52,88 +62,158 @@ class MealService {
         }
     }
 
-    static async getAllMeals() {
+    static async getAllMeals(userId = null) {
         try {
-            const meals = await Meal.findAll({
-                include: [{
+            const includeOptions = [
+                {
                     model: Category,
                     attributes: ['id', 'name', 'description']
-                }]
+                }
+            ];
+
+            // Add Favorites relation if userId is provided
+            if (userId) {
+                includeOptions.push({
+                    model: Favorite,
+                    attributes: ['id'],
+                    where: { userId },
+                    required: false
+                });
+            }
+
+            const meals = await Meal.findAll({
+                include: includeOptions
             });
-            return transformMealsResponse(meals);
+            return transformMealsResponse(meals, userId);
         } catch (error) {
             throw error;
         }
     }
 
-    static async getMealById(id) {
+    static async getMealById(id, userId = null) {
         try {
-            const meal = await Meal.findByPk(id, {
-                include: [{
+            const includeOptions = [
+                {
                     model: Category,
                     attributes: ['id', 'name', 'description']
-                }]
+                }
+            ];
+
+            // Add Favorites relation if userId is provided
+            if (userId) {
+                includeOptions.push({
+                    model: Favorite,
+                    attributes: ['id'],
+                    where: { userId },
+                    required: false
+                });
+            }
+
+            const meal = await Meal.findByPk(id, {
+                include: includeOptions
             });
             if (!meal) {
                 throw new Error('Meal not found');
             }
-            return transformMealResponse(meal);
+            return transformMealResponse(meal, userId);
         } catch (error) {
             throw error;
         }
     }
 
-    static async getMealsByCategory(categoryId) {
+    static async getMealsByCategory(categoryId, userId = null) {
         try {
-            const meals = await Meal.findAll({
-                where: { categoryId },
-                include: [{
+            const includeOptions = [
+                {
                     model: Category,
                     attributes: ['id', 'name', 'description']
-                }]
+                }
+            ];
+
+            // Add Favorites relation if userId is provided
+            if (userId) {
+                includeOptions.push({
+                    model: Favorite,
+                    attributes: ['id'],
+                    where: { userId },
+                    required: false
+                });
+            }
+
+            const meals = await Meal.findAll({
+                where: { categoryId },
+                include: includeOptions
             });
-            return transformMealsResponse(meals);
+            return transformMealsResponse(meals, userId);
         } catch (error) {
             throw error;
         }
     }
 
-    static async getRandomMeal() {
+    static async getRandomMeal(userId = null) {
         try {
             const count = await Meal.count();
             if (count === 0) {
                 throw new Error('No meals available');
             }
 
+            const includeOptions = [
+                { model: Category, attributes: ['id', 'name', 'description'] }
+            ];
+
+            // Add Favorites relation if userId is provided
+            if (userId) {
+                includeOptions.push({
+                    model: Favorite,
+                    attributes: ['id'],
+                    where: { userId },
+                    required: false
+                });
+            }
+
             const randomOffset = Math.floor(Math.random() * count);
             const meals = await Meal.findAll({
-                include: [{ model: Category, attributes: ['id', 'name', 'description'] }],
+                include: includeOptions,
                 offset: randomOffset,
                 limit: 1
             });
 
-            return meals[0] ? transformMealResponse(meals[0]) : null;
+            return meals[0] ? transformMealResponse(meals[0], userId) : null;
         } catch (error) {
             throw error;
         }
     }
 
-    static async getRandomMealByCategory(categoryId) {
+    static async getRandomMealByCategory(categoryId, userId = null) {
         try {
             const count = await Meal.count({ where: { categoryId } });
             if (count === 0) {
                 throw new Error('No meals available for this category');
             }
 
+            const includeOptions = [
+                { model: Category, attributes: ['id', 'name', 'description'] }
+            ];
+
+            // Add Favorites relation if userId is provided
+            if (userId) {
+                includeOptions.push({
+                    model: Favorite,
+                    attributes: ['id'],
+                    where: { userId },
+                    required: false
+                });
+            }
+
             const randomOffset = Math.floor(Math.random() * count);
             const meals = await Meal.findAll({
                 where: { categoryId },
-                include: [{ model: Category, attributes: ['id', 'name', 'description'] }],
+                include: includeOptions,
                 offset: randomOffset,
                 limit: 1
             });
 
-            return meals[0] ? transformMealResponse(meals[0]) : null;
+            return meals[0] ? transformMealResponse(meals[0], userId) : null;
         } catch (error) {
             throw error;
         }

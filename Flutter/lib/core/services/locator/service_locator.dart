@@ -1,30 +1,30 @@
-import 'package:food_gpt/core/managers/secure_storage.dart';
-import 'package:food_gpt/core/services/api/api_service.dart';
-import 'package:food_gpt/features/favorites/data/datasource/favorites_datasource.dart';
-import 'package:food_gpt/features/favorites/data/repository/favorites_repository_impl.dart';
-import 'package:food_gpt/features/favorites/domain/repository/favorites_repository.dart';
-import 'package:food_gpt/features/favorites/presentation/controller/favorites_cubit.dart';
-import 'package:food_gpt/features/home/data/datasource/get_categories_datasource.dart';
-import 'package:food_gpt/features/home/data/repository/get_categories_repository_impl.dart';
-import 'package:food_gpt/features/home/domain/repository/get_categories_repository.dart';
-import 'package:food_gpt/features/home/presentation/controller/home_cubit.dart';
-import 'package:food_gpt/features/login/data/datasource/login_datasource.dart';
-import 'package:food_gpt/features/login/data/repository/login_repository_impl.dart';
-import 'package:food_gpt/features/login/domain/repository/login_repository.dart';
-import 'package:food_gpt/features/login/presentation/controller/login_cubit.dart';
-import 'package:food_gpt/features/recipe_detail/data/datasource/recipe_detail_datasource.dart';
-import 'package:food_gpt/features/recipe_detail/data/repository/recipe_detail_repository_impl.dart';
-import 'package:food_gpt/features/recipe_detail/domain/repository/recipe_detail_repository.dart';
-import 'package:food_gpt/features/recipe_detail/presentation/controller/recipe_detail_cubit.dart';
-import 'package:food_gpt/features/register/data/datasource/register_datasource.dart';
-import 'package:food_gpt/features/register/data/repository/register_repository_impl.dart';
-import 'package:food_gpt/features/register/domain/repository/register_repository.dart';
-import 'package:food_gpt/features/register/presentation/controller/register_cubit.dart';
-import 'package:food_gpt/features/suggestions/data/datasource/suggestions_datasource.dart';
-import 'package:food_gpt/features/suggestions/data/repository/suggestions_repository_impl.dart';
-import 'package:food_gpt/features/suggestions/domain/repository/suggestions_repository.dart';
-import 'package:food_gpt/features/suggestions/presentation/controller/suggestions_cubit.dart';
 import 'package:get_it/get_it.dart';
+import 'package:tafasa/core/managers/secure_storage.dart';
+import 'package:tafasa/core/services/api/api_service.dart';
+import 'package:tafasa/features/favorites/data/datasource/favorites_datasource.dart';
+import 'package:tafasa/features/favorites/data/repository/favorites_repository_impl.dart';
+import 'package:tafasa/features/favorites/domain/repository/favorites_repository.dart';
+import 'package:tafasa/features/favorites/presentation/controller/favorites_cubit.dart';
+import 'package:tafasa/features/home/data/datasource/get_categories_datasource.dart';
+import 'package:tafasa/features/home/data/repository/get_categories_repository_impl.dart';
+import 'package:tafasa/features/home/domain/repository/get_categories_repository.dart';
+import 'package:tafasa/features/home/presentation/controller/home_cubit.dart';
+import 'package:tafasa/features/login/data/datasource/login_datasource.dart';
+import 'package:tafasa/features/login/data/repository/login_repository_impl.dart';
+import 'package:tafasa/features/login/domain/repository/login_repository.dart';
+import 'package:tafasa/features/login/presentation/controller/login_cubit.dart';
+import 'package:tafasa/features/recipe_detail/data/datasource/recipe_detail_datasource.dart';
+import 'package:tafasa/features/recipe_detail/data/repository/recipe_detail_repository_impl.dart';
+import 'package:tafasa/features/recipe_detail/domain/repository/recipe_detail_repository.dart';
+import 'package:tafasa/features/recipe_detail/presentation/controller/recipe_detail_cubit.dart';
+import 'package:tafasa/features/register/data/datasource/register_datasource.dart';
+import 'package:tafasa/features/register/data/repository/register_repository_impl.dart';
+import 'package:tafasa/features/register/domain/repository/register_repository.dart';
+import 'package:tafasa/features/register/presentation/controller/register_cubit.dart';
+import 'package:tafasa/features/suggestions/data/datasource/suggestions_datasource.dart';
+import 'package:tafasa/features/suggestions/data/repository/suggestions_repository_impl.dart';
+import 'package:tafasa/features/suggestions/domain/repository/suggestions_repository.dart';
+import 'package:tafasa/features/suggestions/presentation/controller/suggestions_cubit.dart';
 
 final sl = GetIt.instance;
 final getIt = sl; // Alias for consistency
@@ -97,14 +97,13 @@ class ServiceLocator {
     sl.registerFactory<RegisterCubit>(
       () => RegisterCubit(sl<RegisterRepository>()),
     );
-    sl.registerFactory<LoginCubit>(
-      () => LoginCubit(sl<LoginRepository>()),
-    );
+    sl.registerFactory<LoginCubit>(() => LoginCubit(sl<LoginRepository>()));
     sl.registerFactory<HomeCubit>(
       () => HomeCubit(sl<GetCategoriesRepository>()),
     );
-    sl.registerFactory<SuggestionsCubit>(
-      () => SuggestionsCubit(sl<SuggestionsRepository>()),
+    sl.registerFactoryParam<SuggestionsCubit, int?, void>(
+      (categoryId, _) =>
+          SuggestionsCubit(sl<SuggestionsRepository>(), categoryId: categoryId),
     );
     sl.registerFactory<RecipeDetailCubit>(
       () => RecipeDetailCubit(sl<RecipeDetailRepository>()),

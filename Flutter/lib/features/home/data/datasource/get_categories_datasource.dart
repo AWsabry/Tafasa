@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:food_gpt/core/services/api/api_service.dart';
+import 'package:tafasa/core/services/api/api_service.dart';
 
 class GetCategoriesDatasource {
   final DioClient _dioClient;

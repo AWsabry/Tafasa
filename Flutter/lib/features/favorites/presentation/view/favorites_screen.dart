@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/core/services/locator/service_locator.dart';
-import 'package:food_gpt/features/recipe_detail/presentation/view/recipe_detialed_screen.dart';
-import 'package:food_gpt/features/suggestions/data/model/recipe_model.dart';
+import 'package:tafasa/core/services/locator/service_locator.dart';
+import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/features/recipe_detail/presentation/view/recipe_detialed_screen.dart';
+import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
 
 import '../controller/favorites_cubit.dart';
 
@@ -108,7 +109,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
   Widget build(BuildContext context) {
     return BlocConsumer<FavoritesCubit, FavoritesState>(
       listener: (context, state) {
-        if (state is FavoritesLoaded && state.favorites.isEmpty) {
+        if (state is RemoveFavorite) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Row(
@@ -136,6 +137,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
       builder: (context, state) {
         final favorites = state is FavoritesLoaded ? state.favorites : [];
         final isLoading = state is FavoritesLoading;
+        final cubit = context.read<FavoritesCubit>();
 
         return Directionality(
           textDirection: TextDirection.rtl,
@@ -148,7 +150,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                   colors: [
                     Colors.pink.withOpacity(0.1),
                     Colors.purple.shade50,
-                    Colors.orange.shade50,
+                    AppTheme.primaryOrange,
                   ],
                 ),
               ),
@@ -160,11 +162,11 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           vertical: 16,
-                          horizontal: 20,
+                          // horizontal: 20,
                         ),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [Colors.pink, Colors.pink.shade300],
+                            colors: [Colors.pink, AppTheme.primaryPurple],
                           ),
                           borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(30),
@@ -178,62 +180,65 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                             ),
                           ],
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.3),
-                                borderRadius: BorderRadius.circular(12),
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 10.0),
+                          child: Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.3),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_forward_rounded),
+                                  color: Colors.white,
+                                  onPressed: () => Navigator.pop(context),
+                                ),
                               ),
-                              child: IconButton(
-                                icon: const Icon(Icons.arrow_forward_rounded),
-                                color: Colors.white,
-                                onPressed: () => Navigator.pop(context),
-                              ),
-                            ),
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.favorite,
-                                    color: Colors.white,
-                                    size: 28,
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Text(
-                                    'وجباتي المفضلة',
-                                    style: TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Icon(
+                                      Icons.favorite,
                                       color: Colors.white,
-                                      letterSpacing: 1.2,
+                                      size: 28,
                                     ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.3),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      '${favorites.length}',
-                                      style: const TextStyle(
-                                        color: Colors.white,
+                                    const SizedBox(width: 4),
+                                    const Text(
+                                      'وجباتي المفضلة',
+                                      style: TextStyle(
+                                        fontSize: 22,
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 16,
+                                        color: Colors.white,
+                                        letterSpacing: 1.2,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 10,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.3),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        '${favorites.length}',
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            const SizedBox(width: 48),
-                          ],
+                              const SizedBox(width: 48),
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -267,6 +272,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                   return _buildFavoriteCard(
                                     favorites[index],
                                     index,
+                                    cubit,
                                   );
                                 },
                               ),
@@ -325,7 +331,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.pink, Colors.pink.shade300],
+                colors: [Colors.pink, AppTheme.primaryPurple],
               ),
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
@@ -370,7 +376,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
     );
   }
 
-  Widget _buildFavoriteCard(RecipeModel meal, int index) {
+  Widget _buildFavoriteCard(RecipeModel meal, int index, FavoritesCubit cubit) {
     final category = meal.categoryId.name;
     final categoryColor = _getCategoryColor(category);
     final categoryIcon = _getCategoryIcon(category);
@@ -557,55 +563,62 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                       onPressed: () {
                         showDialog(
                           context: context,
-                          builder: (context) => Directionality(
-                            textDirection: TextDirection.rtl,
-                            child: AlertDialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              title: Row(
-                                children: [
-                                  Icon(
-                                    Icons.warning_amber_rounded,
-                                    color: Colors.orange,
-                                  ),
-                                  const SizedBox(width: 10),
-                                  const Text('تأكيد الحذف'),
-                                ],
-                              ),
-                              content: Text(
-                                'هل تريد إزالة "${meal.name}" من المفضلة؟',
-                                style: const TextStyle(fontSize: 16),
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: Text(
-                                    'إلغاء',
-                                    style: TextStyle(
-                                      color: Colors.grey.shade600,
-                                      fontWeight: FontWeight.bold,
+                          builder: (context) =>
+                              BlocBuilder<FavoritesCubit, FavoritesState>(
+                                bloc: cubit,
+                                builder: (context, state) {
+                                  return Directionality(
+                                    textDirection: TextDirection.rtl,
+                                    child: AlertDialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      title: Row(
+                                        children: [
+                                          Icon(
+                                            Icons.warning_amber_rounded,
+                                            color: Colors.orange,
+                                          ),
+                                          const SizedBox(width: 10),
+                                          const Text('تأكيد الحذف'),
+                                        ],
+                                      ),
+                                      content: Text(
+                                        'هل تريد إزالة "${meal.name}" من المفضلة؟',
+                                        style: const TextStyle(fontSize: 16),
+                                      ),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () =>
+                                              Navigator.pop(context),
+                                          child: Text(
+                                            'إلغاء',
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                            cubit.removeFavorite(
+                                              meal.mealId ?? 0,
+                                            );
+                                          },
+                                          child: const Text(
+                                            'حذف',
+                                            style: TextStyle(
+                                              color: Colors.red,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ),
-                                TextButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                    context
-                                        .read<FavoritesCubit>()
-                                        .removeFavorite(meal.id);
-                                  },
-                                  child: const Text(
-                                    'حذف',
-                                    style: TextStyle(
-                                      color: Colors.red,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                  );
+                                },
+                              ),
                         );
                       },
                     ),

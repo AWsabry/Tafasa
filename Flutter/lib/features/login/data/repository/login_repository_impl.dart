@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:food_gpt/core/error/failure.dart';
-import 'package:food_gpt/core/managers/failure_handler.dart';
-import 'package:food_gpt/core/managers/secure_storage.dart';
-import 'package:food_gpt/features/login/data/datasource/login_datasource.dart';
-import 'package:food_gpt/features/login/data/model/login_model.dart';
-import 'package:food_gpt/features/login/domain/repository/login_repository.dart';
+import 'package:tafasa/core/error/failure.dart';
+import 'package:tafasa/core/managers/failure_handler.dart';
+import 'package:tafasa/core/managers/secure_storage.dart';
+import 'package:tafasa/features/login/data/datasource/login_datasource.dart';
+import 'package:tafasa/features/login/data/model/login_model.dart';
+import 'package:tafasa/features/login/domain/repository/login_repository.dart';
 
 class LoginRepositoryImpl implements LoginRepository {
   final LoginDatasource _datasource;

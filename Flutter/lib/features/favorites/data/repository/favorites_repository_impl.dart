@@ -1,10 +1,10 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:food_gpt/core/error/failure.dart';
-import 'package:food_gpt/core/utils/logger.dart';
-import 'package:food_gpt/features/favorites/data/datasource/favorites_datasource.dart';
-import 'package:food_gpt/features/favorites/domain/repository/favorites_repository.dart';
-import 'package:food_gpt/features/suggestions/data/model/recipe_model.dart';
+import 'package:tafasa/core/error/failure.dart';
+import 'package:tafasa/core/utils/logger.dart';
+import 'package:tafasa/features/favorites/data/datasource/favorites_datasource.dart';
+import 'package:tafasa/features/favorites/domain/repository/favorites_repository.dart';
+import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
 
 class FavoritesRepositoryImpl implements FavoritesRepository {
   final FavoritesDatasource _favoritesDatasource;

@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
-import 'package:food_gpt/core/services/api/api_service.dart';
-import 'package:food_gpt/features/register/data/model/register_model.dart';
+import 'package:tafasa/core/services/api/api_service.dart';
+import 'package:tafasa/features/register/data/model/register_model.dart';
 
 class RegisterDatasource {
   final DioClient _dioClient;

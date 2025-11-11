@@ -1,4 +1,4 @@
-package com.example.food_gpt
+package com.tafasa.app
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -42,22 +42,22 @@ router.get('/categories/:id', CategoryController.getCategoryById);
 router.delete('/categories/:id', auth, CategoryController.deleteCategory);
 
 // Get meals by category
-router.get('/categories/:categoryId/meals', MealController.getMealsByCategory);
+router.get('/categories/:categoryId/meals', auth, MealController.getMealsByCategory);
 
 // Recommended meal for a category (random)
-router.get('/categories/:categoryId/recommended', MealController.getRecommendedMealByCategory);
+router.get('/categories/:categoryId/recommended', auth, MealController.getRecommendedMealByCategory);
 
 // Meal routes
 router.post('/meals', auth, validateMeal, validate, MealController.createMeal);
 
 // Get all meals
-router.get('/meals', MealController.getAllMeals);
+router.get('/meals', auth, MealController.getAllMeals);
 
 // Recommended meal (random) - MUST be before /meals/:id
-router.get('/meals/recommended', MealController.getRecommendedMeal);
+router.get('/meals/recommended', auth, MealController.getRecommendedMeal);
 
 // Get meal by ID
-router.get('/meals/:id', MealController.getMealById);
+router.get('/meals/:id', auth, MealController.getMealById);
 
 // Add ingredient to meal
 router.patch('/meals/:id/ingredients', auth, MealController.addIngredient);

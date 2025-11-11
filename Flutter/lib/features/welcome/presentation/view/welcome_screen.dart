@@ -2,7 +2,9 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:food_gpt/features/register/presentation/view/register_screen.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/features/register/presentation/view/register_screen.dart';
 
 class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
@@ -145,47 +147,61 @@ class _WelcomeScreenState extends State<WelcomeScreen>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                const Color(0xFF1a1a2e),
-                const Color(0xFF16213e),
-                const Color(0xFF0f3460),
+                AppTheme.primaryPurple.withOpacity(0.70),
+                AppTheme.primaryOrange.withOpacity(0.60),
               ],
             ),
           ),
           child: Stack(
             children: [
               // Animated particles
-              _buildFloatingParticle(60, 100, 0, Colors.pink.shade300),
+              _buildFloatingParticle(
+                60,
+                100,
+                0,
+                AppTheme.primaryPurple.withOpacity(0.5),
+              ),
               _buildFloatingParticle(
                 screenWidth - 80,
                 150,
                 0.2,
-                Colors.orange.shade300,
+                AppTheme.primaryOrange.withOpacity(0.5),
               ),
-              _buildFloatingParticle(40, 300, 0.4, Colors.purple.shade300),
+              _buildFloatingParticle(
+                40,
+                300,
+                0.4,
+                AppTheme.primaryPurple.withOpacity(0.4),
+              ),
               _buildFloatingParticle(
                 screenWidth - 60,
                 400,
                 0.6,
-                Colors.amber.shade300,
+                AppTheme.primaryOrange.withOpacity(0.6),
               ),
-              _buildFloatingParticle(100, 500, 0.8, Colors.teal.shade300),
+              _buildFloatingParticle(
+                100,
+                500,
+                0.8,
+                AppTheme.primaryPurple.withOpacity(0.3),
+              ),
               _buildFloatingParticle(
                 screenWidth - 120,
                 600,
                 0.3,
-                Color(0xFF3B8A00),
+                AppTheme.primaryOrange.withOpacity(0.4),
               ),
               _buildFloatingParticle(
                 80,
                 screenHeight - 200,
                 0.5,
-                Colors.blue.shade300,
+                AppTheme.primaryPurple.withOpacity(0.6),
               ),
               _buildFloatingParticle(
                 screenWidth - 100,
                 screenHeight - 150,
                 0.7,
-                Colors.green.shade300,
+                AppTheme.primaryOrange.withOpacity(0.5),
               ),
 
               SafeArea(
@@ -222,20 +238,14 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                       begin: Alignment.topLeft,
                                       end: Alignment.bottomRight,
                                       colors: [
-                                        const Color(
-                                          0xFF3B8A00,
-                                        ), // الأخضر الأساسي
-                                        const Color(
-                                          0xFF4CA500,
-                                        ), // أخضر فاتح شوية
-                                        const Color(
-                                          0xFF2D6A00,
-                                        ), // أخضر غامق شوية
+                                        AppTheme.primaryPurple,
+                                        AppTheme.primaryOrange,
+                                        AppTheme.primaryPurple.withOpacity(0.8),
                                       ],
                                     ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: const Color(0xFF3B8A00)
+                                        color: AppTheme.primaryPurple
                                             .withOpacity(
                                               0.3 +
                                                   _pulseController.value * 0.2,
@@ -250,13 +260,18 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                     margin: const EdgeInsets.all(4),
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      color: const Color(0xFF1a1a2e),
+                                      color: Colors.white.withOpacity(0.1),
                                     ),
                                     child: Center(
-                                      child: Icon(
-                                        Icons.restaurant_menu,
-                                        size: 80,
-                                        color: Colors.white,
+                                      child: SvgPicture.asset(
+                                        'assets/icons/TAFASA WHITE LOGO.svg',
+                                        height: 140,
+                                        width: 140,
+                                        fit: BoxFit.cover,
+                                        colorFilter: const ColorFilter.mode(
+                                          Colors.white,
+                                          BlendMode.srcIn,
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -265,7 +280,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                             ),
                           ),
 
-                          const SizedBox(height: 50),
+                          const SizedBox(height: 20),
 
                           // Title with slide animation
                           SlideTransition(
@@ -274,28 +289,21 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               opacity: _textOpacity,
                               child: Column(
                                 children: [
-                                  ShaderMask(
-                                    shaderCallback: (bounds) => LinearGradient(
-                                      colors: [
-                                        const Color(0xFF3B8A00),
-                                        const Color(0xFF4CA500),
-                                        const Color(0xFF2D6A00),
-                                      ],
-                                    ).createShader(bounds),
-                                    child: const Text(
-                                      'FoodGPT',
-                                      style: TextStyle(
-                                        fontSize: 48,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.white,
-                                        letterSpacing: 2,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 16),
+                                  // const Text(
+                                  //   'Tafasa',
+                                  //   style: TextStyle(
+                                  //     fontFamily: 'GraphicSchool',
+                                  //     fontSize: 48,
+                                  //     fontWeight: FontWeight.bold,
+                                  //     color: Colors.white,
+                                  //     letterSpacing: 2,
+                                  //   ),
+                                  // ),
+                                  // const SizedBox(height: 16),
                                   Text(
                                     'مساعدك الذكي للوصفات',
                                     style: TextStyle(
+                                      fontFamily: 'FFKhallab',
                                       fontSize: 20,
                                       color: Colors.white.withOpacity(0.8),
                                       fontWeight: FontWeight.w500,
@@ -306,7 +314,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 40),
+                          const SizedBox(height: 20),
 
                           // Features cards
                           SlideTransition(
@@ -321,22 +329,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   _buildFeatureChip(
                                     Icons.restaurant,
                                     'وصفات متنوعة',
-                                    Colors.pink.shade400,
+                                    AppTheme.primaryPurple,
                                   ),
                                   _buildFeatureChip(
                                     Icons.fastfood,
                                     'أكلات مصرية',
-                                    Colors.orange.shade400,
+                                    AppTheme.primaryPurple,
                                   ),
                                   _buildFeatureChip(
                                     Icons.favorite,
                                     'مفضلاتك',
-                                    Colors.purple.shade400,
+                                    AppTheme.primaryPurple,
                                   ),
                                   _buildFeatureChip(
                                     Icons.lightbulb,
                                     'اقتراحات ذكية',
-                                    Colors.amber.shade400,
+                                    AppTheme.primaryPurple,
                                   ),
                                 ],
                               ),
@@ -364,6 +372,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   'اكتشف وصفات شهية من المطبخ المصري\nمع شرح مفصل لطريقة التحضير',
                                   textAlign: TextAlign.center,
                                   style: TextStyle(
+                                    fontFamily: 'FFKhallab',
                                     fontSize: 16,
                                     color: Colors.white.withOpacity(0.7),
                                     height: 1.6,
@@ -385,13 +394,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   borderRadius: BorderRadius.circular(30),
                                   gradient: LinearGradient(
                                     colors: [
-                                      Colors.pink.shade400,
-                                      Colors.orange.shade400,
+                                      AppTheme.primaryPurple,
+                                      AppTheme.primaryOrange,
                                     ],
                                   ),
                                   boxShadow: [
                                     BoxShadow(
-                                      color: Colors.pink.withOpacity(0.4),
+                                      color: AppTheme.primaryPurple.withOpacity(
+                                        0.4,
+                                      ),
 
                                       blurRadius: 25,
                                       offset: const Offset(0, 12),
@@ -445,6 +456,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                           Text(
                                             'ابدأ الآن',
                                             style: TextStyle(
+                                              fontFamily: 'FFKhallab',
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20,
@@ -495,6 +507,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
           Text(
             label,
             style: TextStyle(
+              fontFamily: 'FFKhallab',
               color: Colors.white.withOpacity(0.9),
               fontWeight: FontWeight.w600,
               fontSize: 14,

@@ -30,7 +30,9 @@ class MealController {
 
     static async getAllMeals(req, res) {
         try {
-            const meals = await MealService.getAllMeals();
+            // Extract userId from query params or authenticated user
+            const userId = req.query.userId || (req.user ? req.user.id : null);
+            const meals = await MealService.getAllMeals(userId);
             res.json(meals);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -40,7 +42,9 @@ class MealController {
     static async getMealById(req, res) {
         try {
             const { id } = req.params;
-            const meal = await MealService.getMealById(id);
+            // Extract userId from query params or authenticated user
+            const userId = req.query.userId || (req.user ? req.user.id : null);
+            const meal = await MealService.getMealById(id, userId);
             res.json(meal);
         } catch (error) {
             res.status(404).json({ error: error.message });
@@ -50,7 +54,9 @@ class MealController {
     static async getMealsByCategory(req, res) {
         try {
             const { categoryId } = req.params;
-            const meals = await MealService.getMealsByCategory(categoryId);
+            // Extract userId from query params or authenticated user
+            const userId = req.query.userId || (req.user ? req.user.id : null);
+            const meals = await MealService.getMealsByCategory(categoryId, userId);
             res.json(meals);
         } catch (error) {
             res.status(500).json({ error: error.message });
@@ -78,7 +84,9 @@ class MealController {
 
     static async getRecommendedMeal(req, res) {
         try {
-            const meal = await MealService.getRandomMeal();
+            // Extract userId from query params or authenticated user
+            const userId = req.query.userId || (req.user ? req.user.id : null);
+            const meal = await MealService.getRandomMeal(userId);
             if (!meal) return res.status(404).json({ error: 'No meals available' });
             res.json({ message: 'Recommended meal', meal });
         } catch (error) {
@@ -89,7 +97,9 @@ class MealController {
     static async getRecommendedMealByCategory(req, res) {
         try {
             const { categoryId } = req.params;
-            const meal = await MealService.getRandomMealByCategory(categoryId);
+            // Extract userId from query params or authenticated user
+            const userId = req.query.userId || (req.user ? req.user.id : null);
+            const meal = await MealService.getRandomMealByCategory(categoryId, userId);
             if (!meal) return res.status(404).json({ error: 'No meals available for this category' });
             res.json({ message: 'Recommended meal for category', meal });
         } catch (error) {

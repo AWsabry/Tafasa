@@ -60,6 +60,7 @@ class RecipeModel extends Equatable {
   final Category categoryId; // Now an object instead of String
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final bool? isFavorite;
 
   const RecipeModel({
     required this.id,
@@ -71,6 +72,7 @@ class RecipeModel extends Equatable {
     required this.ingredients,
     required this.preparationSteps,
     required this.categoryId,
+    required this.isFavorite,
     this.createdAt,
     this.updatedAt,
   });
@@ -82,6 +84,9 @@ class RecipeModel extends Equatable {
           ? json['mealId'] as int
           : null, // ✅ هنا
       name: json['name'] as String,
+      isFavorite: json.containsKey('isFavorite')
+          ? json['isFavorite'] as bool
+          : null,
       description: json['description'] as String?,
       price: (json['price'] is int)
           ? (json['price'] as int).toDouble()
@@ -146,6 +151,7 @@ class RecipeModel extends Equatable {
     categoryId,
     createdAt,
     updatedAt,
+    isFavorite,
   ];
 }
 

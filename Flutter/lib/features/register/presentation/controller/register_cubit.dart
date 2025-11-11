@@ -1,8 +1,8 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/core/utils/logger.dart';
-import 'package:food_gpt/features/register/data/model/register_model.dart';
-import 'package:food_gpt/features/register/domain/repository/register_repository.dart';
-import 'package:food_gpt/features/register/presentation/controller/register_state.dart';
+import 'package:tafasa/core/utils/logger.dart';
+import 'package:tafasa/features/register/data/model/register_model.dart';
+import 'package:tafasa/features/register/domain/repository/register_repository.dart';
+import 'package:tafasa/features/register/presentation/controller/register_state.dart';
 
 class RegisterCubit extends Cubit<RegisterState> {
   final RegisterRepository _registerRepository;

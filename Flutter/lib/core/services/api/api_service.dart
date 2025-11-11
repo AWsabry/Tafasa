@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:food_gpt/core/utils/logger.dart';
+import 'package:tafasa/core/utils/logger.dart';
 
 class DioClient {
   static final DioClient _instance = DioClient._internal();

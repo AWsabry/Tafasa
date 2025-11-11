@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:dio/dio.dart';
-import 'package:food_gpt/core/error/failure.dart';
+import 'package:tafasa/core/error/failure.dart';
 
 class FailureHandler {
   static Failure fromDioError(DioException e) {

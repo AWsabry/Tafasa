@@ -3,12 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:food_gpt/core/managers/snack_bar_manager.dart';
-import 'package:food_gpt/core/services/locator/service_locator.dart';
-import 'package:food_gpt/features/home/presentation/view/home_screen.dart';
-import 'package:food_gpt/features/login/data/model/login_model.dart';
-import 'package:food_gpt/features/login/presentation/controller/login_state.dart';
-import 'package:food_gpt/features/register/presentation/view/register_screen.dart';
+import 'package:tafasa/core/managers/snack_bar_manager.dart';
+import 'package:tafasa/core/services/locator/service_locator.dart';
+import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/features/home/presentation/view/home_screen.dart';
+import 'package:tafasa/features/login/data/model/login_model.dart';
+import 'package:tafasa/features/login/presentation/controller/login_state.dart';
+import 'package:tafasa/features/register/presentation/view/register_screen.dart';
 
 import '../controller/login_cubit.dart';
 
@@ -210,16 +211,15 @@ class _LoginScreenViewState extends State<_LoginScreenView>
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
               colors: [
-                const Color(0xFF1a1a2e),
-                const Color(0xFF16213e),
-                const Color(0xFF0f3460),
+                AppTheme.primaryPurple.withOpacity(0.70),
+                AppTheme.primaryOrange.withOpacity(0.60),
               ],
             ),
           ),
           child: Stack(
             children: [
               // Animated particles
-              _buildFloatingParticle(40, 80, 0, Colors.pink.shade300),
+              _buildFloatingParticle(40, 80, 0, AppTheme.primaryPurple),
               _buildFloatingParticle(
                 screenWidth - 60,
                 120,
@@ -231,7 +231,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                 screenWidth - 70,
                 350,
                 0.6,
-                Colors.orange.shade300,
+                AppTheme.primaryOrange,
               ),
               _buildFloatingParticle(
                 80,
@@ -317,17 +317,15 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                                       shape: BoxShape.circle,
                                       gradient: LinearGradient(
                                         colors: [
-                                          const Color(0xFF3B8A00),
-                                          const Color(0xFF4CA500),
+                                          AppTheme.primaryPurple,
+                                          AppTheme.primaryOrange,
                                         ],
                                       ),
                                       boxShadow: [
                                         BoxShadow(
-                                          color: const Color(0xFF3B8A00)
-                                              .withOpacity(
-                                                0.3 +
-                                                    _glowController.value * 0.2,
-                                              ),
+                                          color: Colors.orange.withOpacity(
+                                            0.3 + _glowController.value * 0.2,
+                                          ),
                                           blurRadius:
                                               30 + _glowController.value * 15,
                                           spreadRadius: 3,
@@ -343,21 +341,13 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                                 },
                               ),
                               const SizedBox(height: 24),
-                              ShaderMask(
-                                shaderCallback: (bounds) => LinearGradient(
-                                  colors: [
-                                    const Color(0xFF3B8A00),
-                                    const Color(0xFF4CA500),
-                                  ],
-                                ).createShader(bounds),
-                                child: const Text(
-                                  'تسجيل الدخول',
-                                  style: TextStyle(
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
-                                    letterSpacing: 1,
-                                  ),
+                              const Text(
+                                'تسجيل الدخول',
+                                style: TextStyle(
+                                  fontSize: 36,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  letterSpacing: 1,
                                 ),
                               ),
                               const SizedBox(height: 8),
@@ -515,7 +505,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
           decoration: InputDecoration(
             hintText: hint,
             hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
-            prefixIcon: Icon(icon, color: const Color(0xFF3B8A00)),
+            prefixIcon: Icon(icon, color: AppTheme.primaryOrange),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
@@ -540,15 +530,9 @@ class _LoginScreenViewState extends State<_LoginScreenView>
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
         gradient: LinearGradient(
-          colors: [const Color(0xFF3B8A00), const Color(0xFF4CA500)],
+          colors: [AppTheme.primaryPurple, AppTheme.primaryOrange],
         ),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF3B8A00).withOpacity(0.4),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
+        boxShadow: [BoxShadow(color: AppTheme.primaryPurple.withOpacity(0.4))],
       ),
       child: Material(
         color: Colors.transparent,

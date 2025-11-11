@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:food_gpt/core/services/locator/service_locator.dart';
+import 'package:tafasa/core/services/locator/service_locator.dart';
 
 import 'core/theme/app_theme.dart';
 import 'features/welcome/presentation/view/welcome_screen.dart';

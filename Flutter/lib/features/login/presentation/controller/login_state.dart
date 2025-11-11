@@ -1,4 +1,4 @@
-import 'package:food_gpt/core/error/failure.dart';
+import 'package:tafasa/core/error/failure.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'login_state.freezed.dart';

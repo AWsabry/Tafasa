@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
-import 'package:food_gpt/core/error/failure.dart';
-import 'package:food_gpt/core/managers/failure_handler.dart';
-import 'package:food_gpt/core/utils/logger.dart';
-import 'package:food_gpt/features/home/data/datasource/get_categories_datasource.dart';
-import 'package:food_gpt/features/home/data/model/categories_model.dart';
-import 'package:food_gpt/features/home/domain/repository/get_categories_repository.dart';
+import 'package:tafasa/core/error/failure.dart';
+import 'package:tafasa/core/managers/failure_handler.dart';
+import 'package:tafasa/core/utils/logger.dart';
+import 'package:tafasa/features/home/data/datasource/get_categories_datasource.dart';
+import 'package:tafasa/features/home/data/model/categories_model.dart';
+import 'package:tafasa/features/home/domain/repository/get_categories_repository.dart';
 
 class GetCategoriesRepositoryImpl implements GetCategoriesRepository {
   final GetCategoriesDatasource _datasource;
