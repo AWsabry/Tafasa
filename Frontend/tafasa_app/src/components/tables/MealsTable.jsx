@@ -153,7 +153,7 @@ const MealsTable = ({ meals, onDelete }) => {
                   {meal.categoryId?.name || meal.category?.name || '-'}
                 </td>
                 <td className="whitespace-nowrap py-4 px-3 text-sm text-white">
-                  ${meal.price.toFixed(2)}
+                  EGP {meal.price.toFixed(2)}
                 </td>
                 <td className="py-4 px-3 text-sm text-white line-clamp-2">
                   {meal.description || '-'}
@@ -211,7 +211,7 @@ const MealsTable = ({ meals, onDelete }) => {
                     </div>
                     <div className="mt-4 space-y-2">
                       <p className="text-sm text-[var(--color-text-secondary)]">{selectedMeal.description}</p>
-                      <p className="font-medium">Price: ${Number(selectedMeal.price).toFixed(2)}</p>
+                      <p className="font-medium">Price:  ${Number(selectedMeal.price).toFixed(2)}</p>
                       {selectedMeal.categoryId && (
                         <div className="mt-3 p-3 rounded-lg bg-[var(--color-bg-tertiary)] space-y-2">
                           <h4 className="font-semibold text-sm mb-2">Category Information</h4>

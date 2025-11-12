@@ -134,7 +134,45 @@ export const api = {
         try {
           const text = await response.text();
           if (text) errorMessage = text;
-        } catch (_) { }
+        } catch (_) {}
+      }
+
+      throw new Error(errorMessage || `HTTP ${response.status}`);
+    }
+
+    return response.json();
+  },
+
+  upload: async (endpoint, formData) => {
+    const token = localStorage.getItem('token');
+    const headers = {
+      ...((!PUBLIC_ENDPOINTS.includes(endpoint) && token) && {
+        'Authorization': `Bearer ${token}`
+      })
+    };
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    });
+
+    if (!response.ok) {
+      if (response.status === 401 && !PUBLIC_ENDPOINTS.includes(endpoint)) {
+        localStorage.removeItem('token');
+      }
+
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const errorData = await response.json();
+        if (errorData) {
+          errorMessage = errorData.error || errorData.message || JSON.stringify(errorData);
+        }
+      } catch (parseErr) {
+        try {
+          const text = await response.text();
+          if (text) errorMessage = text;
+        } catch (_) {}
       }
 
       throw new Error(errorMessage || `HTTP ${response.status}`);

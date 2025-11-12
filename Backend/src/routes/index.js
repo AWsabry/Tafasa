@@ -6,6 +6,7 @@ import FavoriteController from '../controllers/favoriteController.js';
 import auth from '../middleware/auth.js';
 import { apiLimiter, authLimiter } from '../middleware/rateLimiter.js';
 import { validate, validateCategory, validateMeal, validateRegistration } from '../middleware/validation.js';
+import upload from '../middleware/upload.js';
 
 const router = express.Router();
 
@@ -49,6 +50,9 @@ router.get('/categories/:categoryId/recommended', auth, MealController.getRecomm
 
 // Meal routes
 router.post('/meals', auth, validateMeal, validate, MealController.createMeal);
+
+// Bulk upload meals via Excel
+router.post('/meals/upload', auth, upload.single('file'), MealController.uploadMealsFromExcel);
 
 // Get all meals
 router.get('/meals', auth, MealController.getAllMeals);
