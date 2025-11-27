@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tafasa/core/theme/app_theme.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tafasa/core/services/locator/service_locator.dart';
 import 'package:tafasa/features/recipe_detail/presentation/controller/recipe_detail_cubit.dart';

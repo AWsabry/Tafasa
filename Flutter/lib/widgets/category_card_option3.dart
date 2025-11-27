@@ -1,19 +1,21 @@
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:tafasa/core/theme/app_theme.dart';
 
-class CategoryCard extends StatefulWidget {
+// Option 3: Frosted glass effect with blur
+class CategoryCardOption3 extends StatefulWidget {
   final String category;
   final VoidCallback? onTap;
 
-  const CategoryCard({super.key, required this.category, this.onTap});
+  const CategoryCardOption3({super.key, required this.category, this.onTap});
 
   @override
-  State<CategoryCard> createState() => _CategoryCardState();
+  State<CategoryCardOption3> createState() => _CategoryCardOption3State();
 }
 
-class _CategoryCardState extends State<CategoryCard>
+class _CategoryCardOption3State extends State<CategoryCardOption3>
     with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late AnimationController _shimmerController;
@@ -40,7 +42,6 @@ class _CategoryCardState extends State<CategoryCard>
   }
 
   Color getColorForCategory() {
-    // Alternate between purple and orange to match home screen theme
     final categoryIndex = [
       'فطور',
       'غداء',
@@ -107,7 +108,7 @@ class _CategoryCardState extends State<CategoryCard>
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 15,
                   offset: const Offset(0, 4),
                   spreadRadius: 1,
@@ -136,15 +137,15 @@ class _CategoryCardState extends State<CategoryCard>
                     ),
                   ),
 
-                  // Dark overlay for text readability
+                  // Light white overlay
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.3),
-                          Colors.black.withOpacity(0.6),
+                          Colors.white.withOpacity(0.1),
+                          Colors.white.withOpacity(0.3),
                         ],
                       ),
                     ),
@@ -161,7 +162,7 @@ class _CategoryCardState extends State<CategoryCard>
                             end: Alignment.bottomRight,
                             colors: [
                               Colors.transparent,
-                              Colors.white.withOpacity(0.15),
+                              Colors.white.withOpacity(0.2),
                               Colors.transparent,
                             ],
                             stops: [
@@ -175,32 +176,50 @@ class _CategoryCardState extends State<CategoryCard>
                     },
                   ),
 
-                  // Category Text
+                  // Frosted glass text container
                   Positioned(
                     bottom: 0,
                     left: 0,
                     right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 16,
-                        horizontal: 12,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(25),
+                        bottomRight: Radius.circular(25),
                       ),
-                      child: Text(
-                        widget.category,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(
-                          fontFamily: 'FFKhallab',
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 0.5,
-                          shadows: [
-                            Shadow(
-                              color: Colors.black45,
-                              offset: Offset(0, 2),
-                              blurRadius: 4,
+                      child: BackdropFilter(
+                        filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 16,
+                            horizontal: 12,
+                          ),
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.white.withOpacity(0.4),
+                                Colors.white.withOpacity(0.6),
+                              ],
                             ),
-                          ],
+                            border: Border(
+                              top: BorderSide(
+                                color: Colors.white.withOpacity(0.5),
+                                width: 1,
+                              ),
+                            ),
+                          ),
+                          child: Text(
+                            widget.category,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontFamily: 'FFKhallab',
+                              color: Colors.grey[800],
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
                         ),
                       ),
                     ),

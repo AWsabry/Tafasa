@@ -367,22 +367,28 @@ class _SuggestionScreenState extends State<SuggestionScreen>
     }
   }
 
-  Widget _buildFloatingHeart(double left, double top, double delay) {
+  Widget _buildFloatingParticle(double left, double top, double delay, Color color) {
     return AnimatedBuilder(
       animation: _floatingController,
       builder: (context, child) {
-        final offset = sin((_floatingController.value + delay) * 2 * pi) * 15;
+        final offset = sin((_floatingController.value + delay) * 2 * pi) * 25;
         final opacity =
             (sin((_floatingController.value + delay) * 2 * pi) + 1) / 2;
         return Positioned(
           left: left,
           top: top + offset,
           child: Opacity(
-            opacity: opacity * 0.4,
-            child: Icon(
-              Icons.favorite,
-              color: AppTheme.primaryPurple,
-              size: 20,
+            opacity: opacity * 0.3,
+            child: Container(
+              width: 8,
+              height: 8,
+              decoration: BoxDecoration(
+                color: color,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: color.withOpacity(0.5), blurRadius: 10),
+                ],
+              ),
             ),
           ),
         );
@@ -419,15 +425,11 @@ class _SuggestionScreenState extends State<SuggestionScreen>
           return Directionality(
             textDirection: TextDirection.rtl,
             child: Scaffold(
-              body: Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppTheme.primaryPurple, Colors.purple.shade50],
-                  ),
+              backgroundColor: Colors.white,
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: AppTheme.primaryPurple,
                 ),
-                child: const Center(child: CircularProgressIndicator()),
               ),
             ),
           );
@@ -437,6 +439,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
           return Directionality(
             textDirection: TextDirection.rtl,
             child: Scaffold(
+              backgroundColor: Colors.white,
               body: Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -447,11 +450,24 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                       color: Colors.red,
                     ),
                     const SizedBox(height: 16),
-                    Text(state.message),
+                    Text(
+                      state.message,
+                      style: TextStyle(
+                        fontFamily: 'FFKhallab',
+                        color: Colors.grey[700],
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     ElevatedButton(
                       onPressed: () => Navigator.pop(context),
-                      child: const Text('رجوع'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppTheme.primaryPurple,
+                        foregroundColor: Colors.white,
+                      ),
+                      child: const Text(
+                        'رجوع',
+                        style: TextStyle(fontFamily: 'FFKhallab'),
+                      ),
                     ),
                   ],
                 ),
@@ -468,165 +484,143 @@ class _SuggestionScreenState extends State<SuggestionScreen>
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
-            body: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    getCategoryColor().withOpacity(0.1),
-                    AppTheme.primaryPurple,
-                    Colors.purple.shade50,
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                child: Stack(
-                  children: [
-                    _buildFloatingHeart(30, 100, 0),
-                    _buildFloatingHeart(
-                      MediaQuery.of(context).size.width - 50,
-                      200,
-                      0.3,
-                    ),
-                    _buildFloatingHeart(50, 400, 0.6),
-                    _buildFloatingHeart(
-                      MediaQuery.of(context).size.width - 70,
-                      500,
-                      0.9,
-                    ),
+            backgroundColor: Colors.white,
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  // Floating particles (subtle)
+                  _buildFloatingParticle(30, 150, 0, AppTheme.primaryPurple.withOpacity(0.3)),
+                  _buildFloatingParticle(
+                    MediaQuery.of(context).size.width - 50,
+                    250,
+                    0.3,
+                    AppTheme.primaryOrange.withOpacity(0.3),
+                  ),
+                  _buildFloatingParticle(50, 450, 0.6, AppTheme.primaryPurple.withOpacity(0.2)),
+                  _buildFloatingParticle(
+                    MediaQuery.of(context).size.width - 70,
+                    550,
+                    0.9,
+                    AppTheme.primaryOrange.withOpacity(0.2),
+                  ),
 
-                    Column(
-                      children: [
-                        // Custom App Bar
-                        Container(
+                  Column(
+                    children: [
+                      // Custom App Bar - Clean white style
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 20,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: IconButton(
+                                icon: const Icon(Icons.arrow_forward_rounded),
+                                color: Colors.grey[700],
+                                onPressed: () => Navigator.pop(context),
+                              ),
+                            ),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(8),
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: getCategoryColor().withOpacity(0.1),
+                                    ),
+                                    child: Icon(
+                                      getCategoryIcon(),
+                                      color: getCategoryColor(),
+                                      size: 24,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'اقتراح $currentCategory',
+                                    style: TextStyle(
+                                      fontFamily: 'FFKhallab',
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.grey[800],
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  AnimatedBuilder(
+                                    animation: _sparkleController,
+                                    builder: (context, child) {
+                                      return Transform.rotate(
+                                        angle: _sparkleController.value * 2 * pi,
+                                        child: Icon(
+                                          Icons.auto_awesome,
+                                          color: getCategoryColor(),
+                                          size: 20,
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 48),
+                          ],
+                        ),
+                      ),
+
+                      // Swipe hint text
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16, bottom: 8),
+                        child: Container(
                           padding: const EdgeInsets.symmetric(
-                            vertical: 16,
-                            horizontal: 20,
+                            horizontal: 16,
+                            vertical: 8,
                           ),
                           decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                              colors: [
-                                getCategoryColor(),
-                                getCategoryColor().withOpacity(0.7),
-                              ],
-                            ),
-                            borderRadius: const BorderRadius.only(
-                              bottomLeft: Radius.circular(30),
-                              bottomRight: Radius.circular(30),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: getCategoryColor().withOpacity(0.3),
-                                blurRadius: 15,
-                                offset: const Offset(0, 5),
-                              ),
-                            ],
+                            color: getCategoryColor().withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(20),
                           ),
                           child: Row(
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: IconButton(
-                                  icon: const Icon(Icons.arrow_forward_rounded),
-                                  color: Colors.white,
-                                  onPressed: () => Navigator.pop(context),
+                              Icon(
+                                Icons.swipe,
+                                size: 16,
+                                color: getCategoryColor(),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                'اسحب يميناً أو يساراً لوجبة جديدة',
+                                style: TextStyle(
+                                  fontFamily: 'FFKhallab',
+                                  fontSize: 12,
+                                  color: getCategoryColor(),
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
-                              Expanded(
-                                child: AnimatedBuilder(
-                                  animation: _sparkleAnimation,
-                                  builder: (context, child) {
-                                    return Transform.scale(
-                                      scale:
-                                          1 +
-                                          (sin(
-                                                _sparkleAnimation.value *
-                                                    2 *
-                                                    pi,
-                                              ) *
-                                              0.03),
-                                      child: child,
-                                    );
-                                  },
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        getCategoryIcon(),
-                                        color: Colors.white,
-                                        size: 28,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        'اقتراح $currentCategory',
-                                        style: const TextStyle(
-                                          fontSize: 22,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
-                                          letterSpacing: 1.2,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      AnimatedBuilder(
-                                        animation: _sparkleController,
-                                        builder: (context, child) {
-                                          return Transform.rotate(
-                                            angle:
-                                                _sparkleController.value *
-                                                2 *
-                                                pi,
-                                            child: Icon(
-                                              Icons.auto_awesome,
-                                              color: Colors.white,
-                                              size: 22,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 48),
                             ],
                           ),
                         ),
+                      ),
 
-                        // Swipe hint text
-                        Padding(
-                          padding: const EdgeInsets.only(top: 12),
-                          child: Opacity(
-                            opacity: 0.6,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.swipe,
-                                  size: 18,
-                                  color: getCategoryColor(),
-                                ),
-                                const SizedBox(width: 6),
-                                Text(
-                                  'اسحب يميناً أو يساراً لوجبة جديدة',
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black,
-                                    fontStyle: FontStyle.italic,
-                                    fontWeight: FontWeight.w900,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-
-                        // Main Content
-                        Expanded(
-                          child: Center(
+                      // Main Content
+                      Expanded(
+                        child: Center(
                             child: SingleChildScrollView(
                               child: GestureDetector(
                                 onHorizontalDragUpdate: _onHorizontalDragUpdate,
@@ -681,38 +675,19 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                       child: Container(
                                         margin: const EdgeInsets.all(20),
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.circular(
-                                            35,
-                                          ),
-                                          gradient: LinearGradient(
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                            colors: [
-                                              Colors.white,
-                                              getCategoryColor().withOpacity(
-                                                0.05,
-                                              ),
-                                            ],
-                                          ),
+                                          borderRadius: BorderRadius.circular(25),
+                                          color: Colors.white,
                                           boxShadow: [
                                             BoxShadow(
-                                              color: getCategoryColor()
-                                                  .withOpacity(0.3),
-                                              blurRadius: 30,
-                                              offset: const Offset(0, 15),
-                                              spreadRadius: 5,
-                                            ),
-                                            BoxShadow(
-                                              color: Colors.white,
+                                              color: Colors.black.withOpacity(0.08),
                                               blurRadius: 15,
-                                              offset: const Offset(-5, -5),
+                                              offset: const Offset(0, 4),
+                                              spreadRadius: 1,
                                             ),
                                           ],
                                         ),
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.circular(
-                                            35,
-                                          ),
+                                          borderRadius: BorderRadius.circular(25),
                                           child: Stack(
                                             children: [
                                               Padding(
@@ -725,64 +700,35 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                   children: [
                                                     // Category Badge
                                                     Container(
-                                                      padding:
-                                                          const EdgeInsets.symmetric(
-                                                            horizontal: 20,
-                                                            vertical: 8,
-                                                          ),
+                                                      padding: const EdgeInsets.symmetric(
+                                                        horizontal: 16,
+                                                        vertical: 8,
+                                                      ),
                                                       decoration: BoxDecoration(
-                                                        gradient: LinearGradient(
-                                                          colors: [
-                                                            getCategoryColor(),
-                                                            getCategoryColor()
-                                                                .withOpacity(
-                                                                  0.7,
-                                                                ),
-                                                          ],
+                                                        color: getCategoryColor().withOpacity(0.1),
+                                                        borderRadius: BorderRadius.circular(20),
+                                                        border: Border.all(
+                                                          color: getCategoryColor().withOpacity(0.3),
+                                                          width: 1.5,
                                                         ),
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              20,
-                                                            ),
-                                                        boxShadow: [
-                                                          BoxShadow(
-                                                            color:
-                                                                getCategoryColor()
-                                                                    .withOpacity(
-                                                                      0.3,
-                                                                    ),
-                                                            blurRadius: 8,
-                                                            offset:
-                                                                const Offset(
-                                                                  0,
-                                                                  4,
-                                                                ),
-                                                          ),
-                                                        ],
                                                       ),
                                                       child: Row(
-                                                        mainAxisSize:
-                                                            MainAxisSize.min,
+                                                        mainAxisSize: MainAxisSize.min,
                                                         children: [
                                                           Icon(
                                                             getCategoryIcon(),
-                                                            color: Colors.white,
-                                                            size: 18,
+                                                            color: getCategoryColor(),
+                                                            size: 16,
                                                           ),
-                                                          const SizedBox(
-                                                            width: 6,
-                                                          ),
+                                                          const SizedBox(width: 6),
                                                           Text(
                                                             currentCategory,
-                                                            style:
-                                                                const TextStyle(
-                                                                  color: Colors
-                                                                      .white,
-                                                                  fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
-                                                                  fontSize: 14,
-                                                                ),
+                                                            style: TextStyle(
+                                                              fontFamily: 'FFKhallab',
+                                                              color: getCategoryColor(),
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 14,
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
@@ -793,14 +739,12 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                     // Meal Name
                                                     Text(
                                                       currentMeal["name"],
-                                                      textAlign:
-                                                          TextAlign.center,
+                                                      textAlign: TextAlign.center,
                                                       style: TextStyle(
-                                                        fontSize: 28,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color:
-                                                            getCategoryColor(),
+                                                        fontFamily: 'FFKhallab',
+                                                        fontSize: 26,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.grey[800],
                                                         height: 1.3,
                                                       ),
                                                     ),
@@ -810,31 +754,17 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                     // Image Container
                                                     Container(
                                                       decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              25,
-                                                            ),
+                                                        borderRadius: BorderRadius.circular(20),
                                                         boxShadow: [
                                                           BoxShadow(
-                                                            color:
-                                                                getCategoryColor()
-                                                                    .withOpacity(
-                                                                      0.3,
-                                                                    ),
-                                                            blurRadius: 20,
-                                                            offset:
-                                                                const Offset(
-                                                                  0,
-                                                                  10,
-                                                                ),
+                                                            color: Colors.black.withOpacity(0.1),
+                                                            blurRadius: 15,
+                                                            offset: const Offset(0, 4),
                                                           ),
                                                         ],
                                                       ),
                                                       child: ClipRRect(
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                              25,
-                                                            ),
+                                                        borderRadius: BorderRadius.circular(20),
                                                         child: Stack(
                                                           children: [
                                                             Image.network(
@@ -896,26 +826,6 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                                     ),
                                                                   ),
                                                             ),
-                                                            // Gradient overlay
-                                                            Container(
-                                                              height: 240,
-                                                              decoration: BoxDecoration(
-                                                                gradient: LinearGradient(
-                                                                  begin: Alignment
-                                                                      .topCenter,
-                                                                  end: Alignment
-                                                                      .bottomCenter,
-                                                                  colors: [
-                                                                    Colors
-                                                                        .transparent,
-                                                                    getCategoryColor()
-                                                                        .withOpacity(
-                                                                          0.1,
-                                                                        ),
-                                                                  ],
-                                                                ),
-                                                              ),
-                                                            ),
                                                           ],
                                                         ),
                                                       ),
@@ -944,192 +854,111 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                       child: Column(
                                                         children: [
                                                           Container(
-                                                            padding:
-                                                                const EdgeInsets.all(
-                                                                  16,
-                                                                ),
+                                                            padding: const EdgeInsets.all(16),
                                                             decoration: BoxDecoration(
-                                                              color: getCategoryColor()
-                                                                  .withOpacity(
-                                                                    0.08,
-                                                                  ),
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                    20,
-                                                                  ),
+                                                              color: Colors.grey[50],
+                                                              borderRadius: BorderRadius.circular(15),
                                                               border: Border.all(
-                                                                color: getCategoryColor()
-                                                                    .withOpacity(
-                                                                      0.2,
-                                                                    ),
-                                                                width: 1.5,
+                                                                color: Colors.grey[200]!,
+                                                                width: 1,
                                                               ),
                                                             ),
                                                             child: Column(
                                                               children: [
                                                                 Row(
-                                                                  mainAxisAlignment:
-                                                                      MainAxisAlignment
-                                                                          .center,
+                                                                  mainAxisAlignment: MainAxisAlignment.center,
                                                                   children: [
                                                                     Icon(
-                                                                      Icons
-                                                                          .restaurant,
-                                                                      color:
-                                                                          getCategoryColor(),
-                                                                      size: 20,
+                                                                      Icons.restaurant,
+                                                                      color: getCategoryColor(),
+                                                                      size: 18,
                                                                     ),
-                                                                    const SizedBox(
-                                                                      width: 8,
-                                                                    ),
+                                                                    const SizedBox(width: 8),
                                                                     Text(
                                                                       'نبذة عن الوصفة',
                                                                       style: TextStyle(
-                                                                        fontSize:
-                                                                            16,
-                                                                        fontWeight:
-                                                                            FontWeight.bold,
-                                                                        color:
-                                                                            getCategoryColor(),
+                                                                        fontFamily: 'FFKhallab',
+                                                                        fontSize: 15,
+                                                                        fontWeight: FontWeight.bold,
+                                                                        color: Colors.grey[800],
                                                                       ),
                                                                     ),
                                                                   ],
                                                                 ),
-                                                                const SizedBox(
-                                                                  height: 10,
-                                                                ),
+                                                                const SizedBox(height: 10),
                                                                 Text(
-                                                                  currentMeal["description"] ??
-                                                                      '',
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
+                                                                  currentMeal["description"] ?? '',
+                                                                  textAlign: TextAlign.center,
                                                                   style: TextStyle(
-                                                                    fontSize:
-                                                                        14,
-                                                                    color: Colors
-                                                                        .grey
-                                                                        .shade700,
+                                                                    fontFamily: 'FFKhallab',
+                                                                    fontSize: 13,
+                                                                    color: Colors.grey[700],
                                                                     height: 1.6,
                                                                   ),
                                                                 ),
                                                               ],
                                                             ),
                                                           ),
-                                                          const SizedBox(
-                                                            height: 12,
-                                                          ),
+                                                          const SizedBox(height: 12),
                                                           // Detailed Recipe Button
                                                           Container(
                                                             decoration: BoxDecoration(
-                                                              gradient: LinearGradient(
-                                                                colors: [
-                                                                  getCategoryColor(),
-                                                                  getCategoryColor()
-                                                                      .withOpacity(
-                                                                        0.8,
-                                                                      ),
-                                                                ],
-                                                              ),
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                    20,
-                                                                  ),
+                                                              color: getCategoryColor(),
+                                                              borderRadius: BorderRadius.circular(15),
                                                               boxShadow: [
                                                                 BoxShadow(
-                                                                  color: getCategoryColor()
-                                                                      .withOpacity(
-                                                                        0.3,
-                                                                      ),
-                                                                  blurRadius:
-                                                                      10,
-                                                                  offset:
-                                                                      const Offset(
-                                                                        0,
-                                                                        5,
-                                                                      ),
+                                                                  color: getCategoryColor().withOpacity(0.3),
+                                                                  blurRadius: 10,
+                                                                  offset: const Offset(0, 4),
                                                                 ),
                                                               ],
                                                             ),
                                                             child: Material(
-                                                              color: Colors
-                                                                  .transparent,
+                                                              color: Colors.transparent,
                                                               child: InkWell(
                                                                 onTap: () {
-                                                                  final cubitState =
-                                                                      context
-                                                                          .read<
-                                                                            SuggestionsCubit
-                                                                          >()
-                                                                          .state;
-                                                                  if (cubitState
-                                                                          is SuggestionsLoaded &&
-                                                                      cubitState
-                                                                              .recipe !=
-                                                                          null) {
+                                                                  final cubitState = context.read<SuggestionsCubit>().state;
+                                                                  if (cubitState is SuggestionsLoaded && cubitState.recipe != null) {
                                                                     Navigator.push(
                                                                       context,
                                                                       MaterialPageRoute(
-                                                                        builder:
-                                                                            (
-                                                                              context,
-                                                                            ) => RecipeDetailScreen(
-                                                                              mealId: cubitState.recipe!.id,
-                                                                              categoryColor: getCategoryColor(),
-                                                                              categoryIcon: getCategoryIcon(),
-                                                                            ),
+                                                                        builder: (context) => RecipeDetailScreen(
+                                                                          mealId: cubitState.recipe!.id,
+                                                                          categoryColor: getCategoryColor(),
+                                                                          categoryIcon: getCategoryIcon(),
+                                                                        ),
                                                                       ),
                                                                     );
                                                                   }
                                                                 },
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      20,
-                                                                    ),
+                                                                borderRadius: BorderRadius.circular(15),
                                                                 child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            14,
-                                                                        horizontal:
-                                                                            20,
-                                                                      ),
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                    vertical: 14,
+                                                                    horizontal: 20,
+                                                                  ),
                                                                   child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
                                                                     children: const [
                                                                       Icon(
-                                                                        Icons
-                                                                            .menu_book_rounded,
-                                                                        color: Colors
-                                                                            .white,
-                                                                        size:
-                                                                            22,
+                                                                        Icons.menu_book_rounded,
+                                                                        color: Colors.white,
+                                                                        size: 20,
                                                                       ),
-                                                                      SizedBox(
-                                                                        width:
-                                                                            10,
-                                                                      ),
+                                                                      SizedBox(width: 10),
                                                                       Text(
                                                                         'طريقة التحضير بالتفصيل',
                                                                         style: TextStyle(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
+                                                                          fontFamily: 'FFKhallab',
+                                                                          color: Colors.white,
+                                                                          fontSize: 14,
+                                                                          fontWeight: FontWeight.bold,
                                                                         ),
                                                                       ),
-
                                                                       Icon(
-                                                                        Icons
-                                                                            .arrow_back_rounded,
-                                                                        color: Colors
-                                                                            .white,
-                                                                        size:
-                                                                            20,
+                                                                        Icons.arrow_back_rounded,
+                                                                        color: Colors.white,
+                                                                        size: 18,
                                                                       ),
                                                                     ],
                                                                   ),
@@ -1140,7 +969,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                         ],
                                                       ),
                                                     ),
-                                                    const SizedBox(height: 25),
+                                                    const SizedBox(height: 20),
                                                     // Buttons
                                                     Row(
                                                       children: [
@@ -1148,79 +977,42 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                         Expanded(
                                                           child: Container(
                                                             decoration: BoxDecoration(
-                                                              gradient: LinearGradient(
-                                                                colors: [
-                                                                  getCategoryColor(),
-                                                                  getCategoryColor()
-                                                                      .withOpacity(
-                                                                        0.7,
-                                                                      ),
-                                                                ],
-                                                              ),
-                                                              borderRadius:
-                                                                  BorderRadius.circular(
-                                                                    25,
-                                                                  ),
+                                                              color: getCategoryColor(),
+                                                              borderRadius: BorderRadius.circular(15),
                                                               boxShadow: [
                                                                 BoxShadow(
-                                                                  color: getCategoryColor()
-                                                                      .withOpacity(
-                                                                        0.4,
-                                                                      ),
-                                                                  blurRadius:
-                                                                      10,
-                                                                  offset:
-                                                                      const Offset(
-                                                                        0,
-                                                                        5,
-                                                                      ),
+                                                                  color: getCategoryColor().withOpacity(0.3),
+                                                                  blurRadius: 10,
+                                                                  offset: const Offset(0, 4),
                                                                 ),
                                                               ],
                                                             ),
                                                             child: Material(
-                                                              color: Colors
-                                                                  .transparent,
+                                                              color: Colors.transparent,
                                                               child: InkWell(
-                                                                onTap:
-                                                                    suggestAgain,
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      25,
-                                                                    ),
+                                                                onTap: suggestAgain,
+                                                                borderRadius: BorderRadius.circular(15),
                                                                 child: Padding(
-                                                                  padding:
-                                                                      const EdgeInsets.symmetric(
-                                                                        vertical:
-                                                                            14,
-                                                                        horizontal:
-                                                                            10,
-                                                                      ),
+                                                                  padding: const EdgeInsets.symmetric(
+                                                                    vertical: 14,
+                                                                    horizontal: 10,
+                                                                  ),
                                                                   child: Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment
-                                                                            .center,
+                                                                    mainAxisAlignment: MainAxisAlignment.center,
                                                                     children: const [
                                                                       Icon(
-                                                                        Icons
-                                                                            .refresh_rounded,
-                                                                        color: Colors
-                                                                            .white,
-                                                                        size:
-                                                                            22,
+                                                                        Icons.refresh_rounded,
+                                                                        color: Colors.white,
+                                                                        size: 20,
                                                                       ),
-                                                                      SizedBox(
-                                                                        width:
-                                                                            5,
-                                                                      ),
+                                                                      SizedBox(width: 8),
                                                                       Text(
                                                                         'وجبة أخرى',
                                                                         style: TextStyle(
-                                                                          color:
-                                                                              Colors.white,
-                                                                          fontSize:
-                                                                              15,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
+                                                                          fontFamily: 'FFKhallab',
+                                                                          color: Colors.white,
+                                                                          fontSize: 14,
+                                                                          fontWeight: FontWeight.bold,
                                                                         ),
                                                                       ),
                                                                     ],
@@ -1231,117 +1023,56 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                           ),
                                                         ),
 
-                                                        const SizedBox(
-                                                          width: 12,
-                                                        ),
+                                                        const SizedBox(width: 12),
 
                                                         // Favorite Button
                                                         Expanded(
                                                           child: AnimatedBuilder(
-                                                            animation:
-                                                                _heartBeatAnimation,
+                                                            animation: _heartBeatAnimation,
                                                             builder: (context, child) {
                                                               return Transform.scale(
-                                                                scale:
-                                                                    _heartBeatAnimation
-                                                                        .value,
+                                                                scale: _heartBeatAnimation.value,
                                                                 child: child,
                                                               );
                                                             },
                                                             child: Container(
                                                               decoration: BoxDecoration(
-                                                                gradient: LinearGradient(
-                                                                  colors:
-                                                                      _isFavorite
-                                                                      ? [
-                                                                          Colors
-                                                                              .pink,
-                                                                          Colors
-                                                                              .pink
-                                                                              .shade300,
-                                                                        ]
-                                                                      : [
-                                                                          Colors
-                                                                              .grey
-                                                                              .shade300,
-                                                                          Colors
-                                                                              .grey
-                                                                              .shade200,
-                                                                        ],
-                                                                ),
-                                                                borderRadius:
-                                                                    BorderRadius.circular(
-                                                                      25,
-                                                                    ),
+                                                                color: _isFavorite ? Colors.pink : Colors.grey[200],
+                                                                borderRadius: BorderRadius.circular(15),
                                                                 boxShadow: [
                                                                   BoxShadow(
-                                                                    color:
-                                                                        (_isFavorite
-                                                                                ? Colors.pink
-                                                                                : Colors.grey)
-                                                                            .withOpacity(
-                                                                              0.3,
-                                                                            ),
-                                                                    blurRadius:
-                                                                        10,
-                                                                    offset:
-                                                                        const Offset(
-                                                                          0,
-                                                                          5,
-                                                                        ),
+                                                                    color: (_isFavorite ? Colors.pink : Colors.grey[400]!).withOpacity(0.3),
+                                                                    blurRadius: 10,
+                                                                    offset: const Offset(0, 4),
                                                                   ),
                                                                 ],
                                                               ),
                                                               child: Material(
-                                                                color: Colors
-                                                                    .transparent,
+                                                                color: Colors.transparent,
                                                                 child: InkWell(
-                                                                  onTap:
-                                                                      toggleFavorite,
-                                                                  borderRadius:
-                                                                      BorderRadius.circular(
-                                                                        25,
-                                                                      ),
+                                                                  onTap: toggleFavorite,
+                                                                  borderRadius: BorderRadius.circular(15),
                                                                   child: Padding(
                                                                     padding: const EdgeInsets.symmetric(
-                                                                      vertical:
-                                                                          14,
-                                                                      horizontal:
-                                                                          16,
+                                                                      vertical: 14,
+                                                                      horizontal: 16,
                                                                     ),
                                                                     child: Row(
-                                                                      mainAxisAlignment:
-                                                                          MainAxisAlignment
-                                                                              .center,
+                                                                      mainAxisAlignment: MainAxisAlignment.center,
                                                                       children: [
                                                                         Icon(
-                                                                          _isFavorite
-                                                                              ? Icons.favorite
-                                                                              : Icons.favorite_border_rounded,
-                                                                          color:
-                                                                              _isFavorite
-                                                                              ? Colors.white
-                                                                              : Colors.grey.shade600,
-                                                                          size:
-                                                                              22,
+                                                                          _isFavorite ? Icons.favorite : Icons.favorite_border_rounded,
+                                                                          color: _isFavorite ? Colors.white : Colors.grey[600],
+                                                                          size: 20,
                                                                         ),
-                                                                        const SizedBox(
-                                                                          width:
-                                                                              8,
-                                                                        ),
+                                                                        const SizedBox(width: 8),
                                                                         Text(
-                                                                          _isFavorite
-                                                                              ? 'مفضلة!'
-                                                                              : 'أعجبتني',
+                                                                          _isFavorite ? 'مفضلة!' : 'أعجبتني',
                                                                           style: TextStyle(
-                                                                            color:
-                                                                                _isFavorite
-                                                                                ? Colors.white
-                                                                                : Colors.grey.shade600,
-                                                                            fontSize:
-                                                                                15,
-                                                                            fontWeight:
-                                                                                FontWeight.bold,
+                                                                            fontFamily: 'FFKhallab',
+                                                                            color: _isFavorite ? Colors.white : Colors.grey[600],
+                                                                            fontSize: 14,
+                                                                            fontWeight: FontWeight.bold,
                                                                           ),
                                                                         ),
                                                                       ],
@@ -1358,40 +1089,6 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                 ),
                                               ),
 
-                                              // Corner sparkles
-                                              Positioned(
-                                                top: 15,
-                                                right: 15,
-                                                child: AnimatedBuilder(
-                                                  animation: _sparkleController,
-                                                  builder: (context, child) {
-                                                    return Transform.rotate(
-                                                      angle:
-                                                          _sparkleController
-                                                              .value *
-                                                          2 *
-                                                          pi,
-                                                      child: Opacity(
-                                                        opacity:
-                                                            (sin(
-                                                                  _sparkleController
-                                                                          .value *
-                                                                      2 *
-                                                                      pi,
-                                                                ) +
-                                                                1) /
-                                                            3,
-                                                        child: Icon(
-                                                          Icons.auto_awesome,
-                                                          color:
-                                                              getCategoryColor(),
-                                                          size: 24,
-                                                        ),
-                                                      ),
-                                                    );
-                                                  },
-                                                ),
-                                              ),
                                             ],
                                           ),
                                         ),
@@ -1403,10 +1100,9 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                             ),
                           ),
                         ),
-                      ],
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ),
             ),
           ),

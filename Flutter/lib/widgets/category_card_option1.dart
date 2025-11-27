@@ -3,17 +3,18 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:tafasa/core/theme/app_theme.dart';
 
-class CategoryCard extends StatefulWidget {
+// Option 1: Lighter overlay with colored text and subtle shadow
+class CategoryCardOption1 extends StatefulWidget {
   final String category;
   final VoidCallback? onTap;
 
-  const CategoryCard({super.key, required this.category, this.onTap});
+  const CategoryCardOption1({super.key, required this.category, this.onTap});
 
   @override
-  State<CategoryCard> createState() => _CategoryCardState();
+  State<CategoryCardOption1> createState() => _CategoryCardOption1State();
 }
 
-class _CategoryCardState extends State<CategoryCard>
+class _CategoryCardOption1State extends State<CategoryCardOption1>
     with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late AnimationController _shimmerController;
@@ -40,7 +41,6 @@ class _CategoryCardState extends State<CategoryCard>
   }
 
   Color getColorForCategory() {
-    // Alternate between purple and orange to match home screen theme
     final categoryIndex = [
       'فطور',
       'غداء',
@@ -107,7 +107,7 @@ class _CategoryCardState extends State<CategoryCard>
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.15),
+                  color: Colors.black.withOpacity(0.1),
                   blurRadius: 15,
                   offset: const Offset(0, 4),
                   spreadRadius: 1,
@@ -136,15 +136,15 @@ class _CategoryCardState extends State<CategoryCard>
                     ),
                   ),
 
-                  // Dark overlay for text readability
+                  // Very light overlay for brightness
                   Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
                         end: Alignment.bottomCenter,
                         colors: [
-                          Colors.black.withOpacity(0.3),
-                          Colors.black.withOpacity(0.6),
+                          Colors.white.withOpacity(0.2),
+                          Colors.white.withOpacity(0.4),
                         ],
                       ),
                     ),
@@ -161,7 +161,7 @@ class _CategoryCardState extends State<CategoryCard>
                             end: Alignment.bottomRight,
                             colors: [
                               Colors.transparent,
-                              Colors.white.withOpacity(0.15),
+                              Colors.white.withOpacity(0.2),
                               Colors.transparent,
                             ],
                             stops: [
@@ -175,7 +175,7 @@ class _CategoryCardState extends State<CategoryCard>
                     },
                   ),
 
-                  // Category Text
+                  // Category Text with colored accent
                   Positioned(
                     bottom: 0,
                     left: 0,
@@ -188,17 +188,22 @@ class _CategoryCardState extends State<CategoryCard>
                       child: Text(
                         widget.category,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontFamily: 'FFKhallab',
-                          color: Colors.white,
+                          color: getColorForCategory(),
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           letterSpacing: 0.5,
-                          shadows: [
+                          shadows: const [
                             Shadow(
-                              color: Colors.black45,
+                              color: Colors.white,
+                              offset: Offset(0, 1),
+                              blurRadius: 8,
+                            ),
+                            Shadow(
+                              color: Colors.white,
                               offset: Offset(0, 2),
-                              blurRadius: 4,
+                              blurRadius: 12,
                             ),
                           ],
                         ),

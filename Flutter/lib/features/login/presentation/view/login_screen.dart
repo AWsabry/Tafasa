@@ -160,22 +160,22 @@ class _LoginScreenViewState extends State<_LoginScreenView>
     return AnimatedBuilder(
       animation: _particlesController,
       builder: (context, child) {
-        final offset = sin((_particlesController.value + delay) * 2 * pi) * 20;
+        final offset = sin((_particlesController.value + delay) * 2 * pi) * 25;
         final opacity =
             (sin((_particlesController.value + delay) * 2 * pi) + 1) / 2;
         return Positioned(
           left: left,
           top: top + offset,
           child: Opacity(
-            opacity: opacity * 0.25,
+            opacity: opacity * 0.3,
             child: Container(
-              width: 6,
-              height: 6,
+              width: 8,
+              height: 8,
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(color: color.withOpacity(0.5), blurRadius: 8),
+                  BoxShadow(color: color.withOpacity(0.5), blurRadius: 10),
                 ],
               ),
             ),
@@ -206,38 +206,57 @@ class _LoginScreenViewState extends State<_LoginScreenView>
       child: Scaffold(
         body: Container(
           height: screenHeight,
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.primaryPurple.withOpacity(0.70),
-                AppTheme.primaryOrange.withOpacity(0.60),
-              ],
-            ),
-          ),
+          color: Colors.grey[200],
           child: Stack(
             children: [
               // Animated particles
-              _buildFloatingParticle(40, 80, 0, AppTheme.primaryPurple),
+              _buildFloatingParticle(
+                60,
+                100,
+                0,
+                AppTheme.primaryPurple.withOpacity(0.5),
+              ),
+              _buildFloatingParticle(
+                screenWidth - 80,
+                150,
+                0.2,
+                AppTheme.primaryOrange.withOpacity(0.5),
+              ),
+              _buildFloatingParticle(
+                40,
+                300,
+                0.4,
+                AppTheme.primaryPurple.withOpacity(0.4),
+              ),
               _buildFloatingParticle(
                 screenWidth - 60,
-                120,
-                0.2,
-                const Color(0xFF3B8A00),
-              ),
-              _buildFloatingParticle(50, 250, 0.4, Colors.purple.shade300),
-              _buildFloatingParticle(
-                screenWidth - 70,
-                350,
+                400,
                 0.6,
-                AppTheme.primaryOrange,
+                AppTheme.primaryOrange.withOpacity(0.6),
+              ),
+              _buildFloatingParticle(
+                100,
+                500,
+                0.8,
+                AppTheme.primaryPurple.withOpacity(0.3),
+              ),
+              _buildFloatingParticle(
+                screenWidth - 120,
+                600,
+                0.3,
+                AppTheme.primaryOrange.withOpacity(0.4),
               ),
               _buildFloatingParticle(
                 80,
                 screenHeight - 200,
-                0.8,
-                Colors.blue.shade300,
+                0.5,
+                AppTheme.primaryPurple.withOpacity(0.6),
+              ),
+              _buildFloatingParticle(
+                screenWidth - 100,
+                screenHeight - 150,
+                0.7,
+                AppTheme.primaryOrange.withOpacity(0.5),
               ),
 
               SafeArea(
@@ -285,7 +304,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                             },
                             icon: Icon(
                               Icons.arrow_forward_rounded,
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.grey[700],
                               size: 28,
                             ),
                           ),
@@ -315,17 +334,14 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                                     height: 100,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppTheme.primaryPurple,
-                                          AppTheme.primaryOrange,
-                                        ],
-                                      ),
+                                      color: AppTheme.primaryPurple,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.orange.withOpacity(
-                                            0.3 + _glowController.value * 0.2,
-                                          ),
+                                          color: AppTheme.primaryPurple
+                                              .withOpacity(
+                                                0.3 +
+                                                    _glowController.value * 0.2,
+                                              ),
                                           blurRadius:
                                               30 + _glowController.value * 15,
                                           spreadRadius: 3,
@@ -341,12 +357,13 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                                 },
                               ),
                               const SizedBox(height: 24),
-                              const Text(
+                              Text(
                                 'تسجيل الدخول',
                                 style: TextStyle(
+                                  fontFamily: 'FFKhallab',
                                   fontSize: 36,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: Colors.grey[800],
                                   letterSpacing: 1,
                                 ),
                               ),
@@ -354,8 +371,9 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                               Text(
                                 'مرحباً بعودتك!',
                                 style: TextStyle(
+                                  fontFamily: 'FFKhallab',
                                   fontSize: 16,
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.grey[600],
                                 ),
                               ),
                             ],
@@ -407,9 +425,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                                             _obscure
                                                 ? Icons.visibility_off_outlined
                                                 : Icons.visibility_outlined,
-                                            color: Colors.white.withOpacity(
-                                              0.6,
-                                            ),
+                                            color: Colors.grey[600],
                                           ),
                                         ),
                                         validator: (value) {
@@ -488,23 +504,25 @@ class _LoginScreenViewState extends State<_LoginScreenView>
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [
-              Colors.white.withOpacity(0.05),
-              Colors.white.withOpacity(0.02),
-            ],
-          ),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          color: Colors.white,
+          border: Border.all(color: Colors.grey[300]!, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.grey[800]),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+            hintStyle: TextStyle(color: Colors.grey[400]),
             prefixIcon: Icon(icon, color: AppTheme.primaryOrange),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(
@@ -528,11 +546,17 @@ class _LoginScreenViewState extends State<_LoginScreenView>
       width: double.infinity,
       height: 60,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryPurple, AppTheme.primaryOrange],
-        ),
-        boxShadow: [BoxShadow(color: AppTheme.primaryPurple.withOpacity(0.4))],
+        borderRadius: BorderRadius.circular(30),
+        color: AppTheme.primaryPurple,
+
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryPurple.withOpacity(0.4),
+
+            blurRadius: 25,
+            offset: const Offset(0, 12),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -552,6 +576,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                 : Text(
                     text,
                     style: const TextStyle(
+                      fontFamily: 'FFKhallab',
                       color: Colors.white,
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
