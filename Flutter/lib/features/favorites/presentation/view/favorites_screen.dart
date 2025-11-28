@@ -153,9 +153,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                     FadeTransition(
                       opacity: _headerAnimation,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: const BorderRadius.only(
@@ -189,12 +187,6 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    Icon(
-                                      Icons.favorite,
-                                      color: AppTheme.primaryPurple,
-                                      size: 28,
-                                    ),
-                                    const SizedBox(width: 4),
                                     Text(
                                       'وجباتي المفضلة',
                                       style: TextStyle(
