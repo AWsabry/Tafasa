@@ -2,7 +2,7 @@ class RegisterModel {
   final String username;
   final int age;
   final String password;
-  final String email;
+  final String? email;
   final String phoneNumber;
 
   RegisterModel({
@@ -10,16 +10,16 @@ class RegisterModel {
     required this.age,
     required this.password,
     required this.phoneNumber,
-    required this.email,
+    this.email,
   });
 
   factory RegisterModel.fromJson(Map<String, dynamic> json) {
     return RegisterModel(
       username: json['username'] as String,
-      age: json['email'] as int,
+      age: json['age'] as int,
       password: json['password'] as String,
       phoneNumber: json['phoneNumber'] as String,
-      email: json["email"] as String,
+      email: json["email"] as String?,
     );
   }
 

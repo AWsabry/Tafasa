@@ -186,11 +186,18 @@ class _LoginScreenViewState extends State<_LoginScreenView>
   }
 
   void _handleLogin(BuildContext context) async {
+    final emailRegex = RegExp(
+      r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$',
+    );
+    final bool isEmail = emailRegex.hasMatch(
+      _emailController.text.toLowerCase(),
+    );
     if (_formKey.currentState!.validate()) {
       await context.read<LoginCubit>().login(
         LoginModel(
           password: _passwordController.text,
-          email: _emailController.text.toLowerCase(),
+          email: isEmail ? _emailController.text.toLowerCase() : null,
+          phone: isEmail ? null : "+2${_emailController.text}",
         ),
       );
     }
@@ -394,12 +401,12 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                                   // Email field
                                   _buildTextField(
                                     controller: _emailController,
-                                    hint: 'البريد الإلكتروني',
+                                    hint: 'البريد الإلكتروني أو رقم الهاتف',
                                     icon: Icons.email_outlined,
                                     keyboardType: TextInputType.emailAddress,
                                     validator: (value) {
                                       if (value?.isEmpty ?? true) {
-                                        return 'من فضلك أدخل البريد الإلكتروني';
+                                        return 'من فضلك أدخل البريد الإلكتروني أو رقم الهاتف';
                                       }
                                       return null;
                                     },
@@ -522,7 +529,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
           style: TextStyle(color: Colors.grey[800]),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[400]),
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
             prefixIcon: Icon(icon, color: AppTheme.primaryOrange),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(

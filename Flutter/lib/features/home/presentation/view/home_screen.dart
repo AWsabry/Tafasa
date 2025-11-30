@@ -11,6 +11,7 @@ import 'package:tafasa/features/suggestions/presentation/controller/suggestions_
 import 'package:tafasa/features/suggestions/presentation/view/suggestions_screen.dart';
 import 'package:tafasa/widgets/category_card_option2.dart';
 
+import '../../../about/presentation/view/about_screen.dart';
 import '../../../favorites/presentation/view/favorites_screen.dart';
 import '../controller/home_cubit.dart';
 
@@ -519,6 +520,42 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                             PageRouteBuilder(
                               pageBuilder: (_, __, ___) =>
                                   const FavoritesScreen(),
+                              transitionDuration: const Duration(
+                                milliseconds: 600,
+                              ),
+                              transitionsBuilder: (_, animation, __, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position:
+                                        Tween<Offset>(
+                                          begin: const Offset(0, 0.3),
+                                          end: Offset.zero,
+                                        ).animate(
+                                          CurvedAnimation(
+                                            parent: animation,
+                                            curve: Curves.easeOutCubic,
+                                          ),
+                                        ),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                            ),
+                          ).then((_) => context.read<HomeCubit>().resetIndex());
+                        },
+                      ),
+                      _buildNavItem(
+                        icon: Icons.info_rounded,
+                        label: 'من نحن',
+                        isSelected: currentIndex == 3,
+                        onTap: () {
+                          context.read<HomeCubit>().setCurrentIndex(3);
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  const AboutScreen(),
                               transitionDuration: const Duration(
                                 milliseconds: 600,
                               ),

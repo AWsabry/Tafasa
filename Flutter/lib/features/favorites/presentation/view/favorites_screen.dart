@@ -140,6 +140,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
       builder: (context, state) {
         final favorites = state is FavoritesLoaded ? state.favorites : [];
         final isLoading = state is FavoritesLoading;
+        final selectedCategory = state is FavoritesLoaded ? state.selectedCategory : null;
         final cubit = context.read<FavoritesCubit>();
 
         return Directionality(
@@ -226,6 +227,77 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                         ),
                       ),
                     ),
+
+                    // Category Filter
+                    if (!isLoading && favorites.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              _buildFilterChip(
+                                'الكل',
+                                selectedCategory,
+                                cubit,
+                                Icons.apps_rounded,
+                                Colors.grey.shade700,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'فطور',
+                                selectedCategory,
+                                cubit,
+                                Icons.wb_sunny_rounded,
+                                Colors.orange,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'غداء',
+                                selectedCategory,
+                                cubit,
+                                Icons.restaurant_rounded,
+                                Colors.red,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'عشاء',
+                                selectedCategory,
+                                cubit,
+                                Icons.nightlight_round,
+                                Colors.purple,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'تحلية',
+                                selectedCategory,
+                                cubit,
+                                Icons.cake_rounded,
+                                Colors.pink,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'سناكس',
+                                selectedCategory,
+                                cubit,
+                                Icons.cookie_rounded,
+                                Colors.amber,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'صحي',
+                                selectedCategory,
+                                cubit,
+                                Icons.eco_rounded,
+                                Colors.green,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
 
                     // Content
                     Expanded(
@@ -622,6 +694,75 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(
+    String category,
+    String? selectedCategory,
+    FavoritesCubit cubit,
+    IconData icon,
+    Color color,
+  ) {
+    final isSelected = selectedCategory == category ||
+                       (selectedCategory == null && category == 'الكل');
+
+    return GestureDetector(
+      onTap: () {
+        cubit.filterByCategory(category);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [color, color.withOpacity(0.7)],
+                )
+              : null,
+          color: isSelected ? null : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.white : color,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              category,
+              style: TextStyle(
+                fontFamily: 'FFKhallab',
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.white : Colors.grey.shade700,
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tafasa/core/managers/snack_bar_manager.dart';
 import 'package:tafasa/core/services/locator/service_locator.dart';
 import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/core/utils/logger.dart';
 import 'package:tafasa/features/login/presentation/view/login_screen.dart';
 import 'package:tafasa/features/register/data/model/register_model.dart';
 import 'package:tafasa/features/register/presentation/controller/register_state.dart';
@@ -239,12 +240,18 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
     final state = cubit.state;
 
     if (_formKey.currentState!.validate() && state.acceptTerms) {
+      Logger.debug(_nameController.text);
+      Logger.debug(_emailController.text);
+      Logger.debug(_passwordController.text);
+      Logger.debug(_phoneController.text);
+      Logger.debug(_ageController.text);
+
       await cubit.register(
         RegisterModel(
           username: _nameController.text,
-          email: _emailController.text,
+          email: _emailController.text.isEmpty ? null : _emailController.text,
           password: _passwordController.text,
-          phoneNumber: _phoneController.text,
+          phoneNumber: "+2${_phoneController.text}",
           age: int.parse(_ageController.text),
         ),
       );
@@ -630,16 +637,10 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
           const SizedBox(height: 24),
           _buildTextField(
             controller: _emailController,
-            hint: 'البريد الإلكتروني',
+            hint: 'البريد الإلكتروني (اختياري)',
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'من فضلك أدخل البريد الإلكتروني';
-              }
-              if (!value!.contains('@')) {
-                return 'البريد الإلكتروني غير صحيح';
-              }
               return null;
             },
           ),
@@ -833,7 +834,7 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
           style: TextStyle(color: Colors.grey[800]),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.grey[400]),
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
             prefixIcon: Icon(icon, color: AppTheme.primaryOrange),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(

@@ -4,13 +4,21 @@ class AuthController {
     static async register(req, res) {
         try {
             const { username, email, password, phoneNumber, age } = req.body;
-            
-            if (!username || !email || !password) {
-                return res.status(400).json({ error: 'Username, email, and password are required' });
+
+            console.log('Registration request body:', {
+                username,
+                email,
+                password: password ? '***' : undefined,
+                phoneNumber,
+                age
+            });
+
+            if (!username || !password || !phoneNumber) {
+                return res.status(400).json({ error: 'Username, phone number, and password are required' });
             }
 
             const { user, token } = await AuthService.register(username, email, password, phoneNumber, age);
-            
+
             res.status(201).json({
                 message: 'User registered successfully',
                 user: {
@@ -29,14 +37,14 @@ class AuthController {
 
     static async login(req, res) {
         try {
-            const { email, password } = req.body;
-            
-            if (!email || !password) {
-                return res.status(400).json({ error: 'Email and password are required' });
+            const { email, phone, password } = req.body;
+
+            if ((!email && !phone) || !password) {
+                return res.status(400).json({ error: 'Email or phone number and password are required' });
             }
 
-            const { user, token } = await AuthService.login(email, password);
-            
+            const { user, token } = await AuthService.login(email, phone, password);
+
             res.json({
                 message: 'Login successful',
                 user: {
