@@ -8,6 +8,7 @@ export const validateRegistration = [
         .matches(/^[a-zA-Z0-9_]+$/)
         .withMessage('Username can only contain letters, numbers and underscores'),
     body('email')
+        .optional({ checkFalsy: true })
         .trim()
         .isEmail()
         .normalizeEmail()
@@ -18,8 +19,9 @@ export const validateRegistration = [
         .matches(/\d/)
         .withMessage('Password must contain at least one number'),
     body('phoneNumber')
-        .optional()
         .trim()
+        .notEmpty()
+        .withMessage('Phone number is required')
         .matches(/^\+?[1-9]\d{1,14}$/)
         .withMessage('Please enter a valid international phone number format'),
     body('age')
@@ -59,7 +61,11 @@ export const validateCategory = [
 export const validate = (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        console.log('Validation errors:', errors.array());
+        return res.status(400).json({
+            error: 'Validation failed',
+            errors: errors.array()
+        });
     }
     next();
 };

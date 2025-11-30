@@ -5,18 +5,29 @@ import User from '../models/User.js';
 class AuthService {
     static async register(username, email, password, phoneNumber, age) {
         try {
-            const existingUser = await User.findOne({ 
+            console.log('AuthService.register called with:', { username, email, phoneNumber, age });
+
+            const whereConditions = [
+                { username },
+                { phoneNumber }
+            ];
+
+            // Only check email if it's provided
+            if (email) {
+                whereConditions.push({ email });
+            }
+
+            console.log('Checking for existing user with conditions:', whereConditions);
+
+            const existingUser = await User.findOne({
                 where: {
-                    [Op.or]: [
-                        { email }, 
-                        { username },
-                        ...(phoneNumber ? [{ phoneNumber }] : [])
-                    ]
+                    [Op.or]: whereConditions
                 }
             });
 
             if (existingUser) {
-                if (existingUser.email === email) {
+                console.log('Existing user found:', existingUser.username);
+                if (email && existingUser.email === email) {
                     throw new Error('Email already in use');
                 }
                 if (existingUser.username === username) {
@@ -27,6 +38,7 @@ class AuthService {
                 }
             }
 
+            console.log('Creating new user...');
             const user = await User.create({
                 username,
                 email,
@@ -34,17 +46,37 @@ class AuthService {
                 phoneNumber,
                 age
             });
-            
+
+            console.log('User created successfully:', user.id);
             const token = this.generateToken(user.id);
             return { user, token };
         } catch (error) {
+            console.error('AuthService.register error:', error.message);
+            console.error('Error name:', error.name);
+            console.error('Full error:', JSON.stringify(error, null, 2));
+            if (error.errors && error.errors.length > 0) {
+                console.error('Validation errors:', error.errors.map(e => ({
+                    field: e.path,
+                    message: e.message,
+                    value: e.value
+                })));
+            }
             throw error;
         }
     }
 
-    static async login(email, password) {
+    static async login(email, phone, password) {
         try {
-            const user = await User.findOne({ where: { email } });
+            // Build the where condition based on what was provided
+            const whereCondition = {};
+
+            if (email) {
+                whereCondition.email = email;
+            } else if (phone) {
+                whereCondition.phoneNumber = phone;
+            }
+
+            const user = await User.findOne({ where: whereCondition });
             if (!user) {
                 throw new Error('User not found');
             }

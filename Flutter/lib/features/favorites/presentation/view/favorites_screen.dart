@@ -119,7 +119,10 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                   Expanded(
                     child: Text(
                       'تمت إزالة الوجبة من المفضلة',
-                      style: const TextStyle(fontWeight: FontWeight.w500),
+                      style: const TextStyle(
+                        fontFamily: 'FFKhallab',
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
                 ],
@@ -137,46 +140,32 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
       builder: (context, state) {
         final favorites = state is FavoritesLoaded ? state.favorites : [];
         final isLoading = state is FavoritesLoading;
+        final selectedCategory = state is FavoritesLoaded ? state.selectedCategory : null;
         final cubit = context.read<FavoritesCubit>();
 
         return Directionality(
           textDirection: TextDirection.rtl,
           child: Scaffold(
             body: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Colors.pink.withOpacity(0.1),
-                    Colors.purple.shade50,
-                    AppTheme.primaryOrange,
-                  ],
-                ),
-              ),
+              color: Colors.grey[200],
               child: SafeArea(
                 child: Column(
                   children: [
                     FadeTransition(
                       opacity: _headerAnimation,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                          // horizontal: 20,
-                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
                         decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [Colors.pink, AppTheme.primaryPurple],
-                          ),
+                          color: Colors.white,
                           borderRadius: const BorderRadius.only(
                             bottomLeft: Radius.circular(30),
                             bottomRight: Radius.circular(30),
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.pink.withOpacity(0.3),
-                              blurRadius: 15,
-                              offset: const Offset(0, 5),
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 10,
+                              offset: const Offset(0, 2),
                             ),
                           ],
                         ),
@@ -186,12 +175,12 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                             children: [
                               Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.3),
+                                  color: Colors.grey[100],
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                                 child: IconButton(
                                   icon: const Icon(Icons.arrow_forward_rounded),
-                                  color: Colors.white,
+                                  color: AppTheme.primaryPurple,
                                   onPressed: () => Navigator.pop(context),
                                 ),
                               ),
@@ -199,18 +188,13 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                    const Icon(
-                                      Icons.favorite,
-                                      color: Colors.white,
-                                      size: 28,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    const Text(
+                                    Text(
                                       'وجباتي المفضلة',
                                       style: TextStyle(
+                                        fontFamily: 'FFKhallab',
                                         fontSize: 22,
                                         fontWeight: FontWeight.bold,
-                                        color: Colors.white,
+                                        color: Colors.grey[800],
                                         letterSpacing: 1.2,
                                       ),
                                     ),
@@ -221,12 +205,13 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.3),
+                                        color: AppTheme.primaryPurple,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
                                         '${favorites.length}',
                                         style: const TextStyle(
+                                          fontFamily: 'FFKhallab',
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
@@ -243,12 +228,83 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                       ),
                     ),
 
+                    // Category Filter
+                    if (!isLoading && favorites.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 20,
+                          vertical: 12,
+                        ),
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.horizontal,
+                          child: Row(
+                            children: [
+                              _buildFilterChip(
+                                'الكل',
+                                selectedCategory,
+                                cubit,
+                                Icons.apps_rounded,
+                                Colors.grey.shade700,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'فطور',
+                                selectedCategory,
+                                cubit,
+                                Icons.wb_sunny_rounded,
+                                Colors.orange,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'غداء',
+                                selectedCategory,
+                                cubit,
+                                Icons.restaurant_rounded,
+                                Colors.red,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'عشاء',
+                                selectedCategory,
+                                cubit,
+                                Icons.nightlight_round,
+                                Colors.purple,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'تحلية',
+                                selectedCategory,
+                                cubit,
+                                Icons.cake_rounded,
+                                Colors.pink,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'سناكس',
+                                selectedCategory,
+                                cubit,
+                                Icons.cookie_rounded,
+                                Colors.amber,
+                              ),
+                              const SizedBox(width: 8),
+                              _buildFilterChip(
+                                'صحي',
+                                selectedCategory,
+                                cubit,
+                                Icons.eco_rounded,
+                                Colors.green,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
                     // Content
                     Expanded(
                       child: isLoading
                           ? Center(
                               child: CircularProgressIndicator(
-                                color: Colors.pink,
+                                color: AppTheme.primaryPurple,
                                 strokeWidth: 3,
                               ),
                             )
@@ -296,19 +352,20 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
           Container(
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
-              color: Colors.pink.withOpacity(0.1),
+              color: AppTheme.primaryPurple.withOpacity(0.1),
               shape: BoxShape.circle,
             ),
             child: Icon(
               Icons.favorite_border,
               size: 80,
-              color: Colors.pink.withOpacity(0.5),
+              color: AppTheme.primaryPurple.withOpacity(0.5),
             ),
           ),
           const SizedBox(height: 24),
           Text(
             'لا توجد وجبات مفضلة بعد',
             style: TextStyle(
+              fontFamily: 'FFKhallab',
               fontSize: 22,
               fontWeight: FontWeight.bold,
               color: Colors.grey.shade700,
@@ -321,6 +378,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
               'ابدأ بإضافة وجباتك المفضلة\nلتجدها هنا في أي وقت',
               textAlign: TextAlign.center,
               style: TextStyle(
+                fontFamily: 'FFKhallab',
                 fontSize: 16,
                 color: Colors.grey.shade600,
                 height: 1.5,
@@ -330,13 +388,11 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
           const SizedBox(height: 30),
           Container(
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.pink, AppTheme.primaryPurple],
-              ),
+              color: AppTheme.primaryPurple,
               borderRadius: BorderRadius.circular(25),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.pink.withOpacity(0.3),
+                  color: AppTheme.primaryPurple.withOpacity(0.3),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -360,6 +416,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                       Text(
                         'استكشف الوجبات',
                         style: TextStyle(
+                          fontFamily: 'FFKhallab',
                           color: Colors.white,
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -580,12 +637,20 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                             color: Colors.orange,
                                           ),
                                           const SizedBox(width: 10),
-                                          const Text('تأكيد الحذف'),
+                                          const Text(
+                                            'تأكيد الحذف',
+                                            style: TextStyle(
+                                              fontFamily: 'FFKhallab',
+                                            ),
+                                          ),
                                         ],
                                       ),
                                       content: Text(
                                         'هل تريد إزالة "${meal.name}" من المفضلة؟',
-                                        style: const TextStyle(fontSize: 16),
+                                        style: const TextStyle(
+                                          fontFamily: 'FFKhallab',
+                                          fontSize: 16,
+                                        ),
                                       ),
                                       actions: [
                                         TextButton(
@@ -594,6 +659,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                           child: Text(
                                             'إلغاء',
                                             style: TextStyle(
+                                              fontFamily: 'FFKhallab',
                                               color: Colors.grey.shade600,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -609,6 +675,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                           child: const Text(
                                             'حذف',
                                             style: TextStyle(
+                                              fontFamily: 'FFKhallab',
                                               color: Colors.red,
                                               fontWeight: FontWeight.bold,
                                             ),
@@ -627,6 +694,75 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
               ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterChip(
+    String category,
+    String? selectedCategory,
+    FavoritesCubit cubit,
+    IconData icon,
+    Color color,
+  ) {
+    final isSelected = selectedCategory == category ||
+                       (selectedCategory == null && category == 'الكل');
+
+    return GestureDetector(
+      onTap: () {
+        cubit.filterByCategory(category);
+      },
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 300),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          gradient: isSelected
+              ? LinearGradient(
+                  colors: [color, color.withOpacity(0.7)],
+                )
+              : null,
+          color: isSelected ? null : Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+          boxShadow: isSelected
+              ? [
+                  BoxShadow(
+                    color: color.withOpacity(0.3),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ]
+              : [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 5,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 18,
+              color: isSelected ? Colors.white : color,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              category,
+              style: TextStyle(
+                fontFamily: 'FFKhallab',
+                fontSize: 14,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                color: isSelected ? Colors.white : Colors.grey.shade700,
+              ),
+            ),
+          ],
         ),
       ),
     );

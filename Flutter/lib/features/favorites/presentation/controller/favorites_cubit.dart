@@ -7,6 +7,8 @@ part 'favorites_state.dart';
 
 class FavoritesCubit extends Cubit<FavoritesState> {
   final FavoritesRepository _favoritesRepository;
+  List<RecipeModel> _allFavorites = [];
+  String? _selectedCategory;
 
   FavoritesCubit(this._favoritesRepository) : super(const FavoritesInitial());
 
@@ -16,8 +18,27 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     final result = await _favoritesRepository.getAllFavorites();
     result.fold(
       (failure) => emit(FavoritesError(failure.message)),
-      (favorites) => emit(FavoritesLoaded(favorites)),
+      (favorites) {
+        _allFavorites = favorites;
+        _applyFilter();
+      },
     );
+  }
+
+  void filterByCategory(String? category) {
+    _selectedCategory = category;
+    _applyFilter();
+  }
+
+  void _applyFilter() {
+    if (_selectedCategory == null || _selectedCategory == 'الكل') {
+      emit(FavoritesLoaded(_allFavorites, selectedCategory: _selectedCategory));
+    } else {
+      final filtered = _allFavorites
+          .where((meal) => meal.categoryId.name == _selectedCategory)
+          .toList();
+      emit(FavoritesLoaded(filtered, selectedCategory: _selectedCategory));
+    }
   }
 
   Future<void> removeFavorite(int mealId) async {
@@ -25,10 +46,10 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     if (currentState is FavoritesLoaded) {
       final result = await _favoritesRepository.removeFavorite(mealId);
       result.fold((failure) => emit(FavoritesError(failure.message)), (_) {
-        final updatedFavorites = currentState.favorites
+        _allFavorites = _allFavorites
             .where((meal) => meal.mealId != mealId)
             .toList();
-        emit(FavoritesLoaded(updatedFavorites));
+        _applyFilter();
         emit(RemoveFavorite());
       });
     }

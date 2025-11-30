@@ -1,5 +1,5 @@
-import { DataTypes, Model } from 'sequelize';
 import bcrypt from 'bcryptjs';
+import { DataTypes, Model } from 'sequelize';
 import sequelize from '../config/database.js';
 
 class User extends Model {
@@ -24,10 +24,10 @@ User.init({
     },
     phoneNumber: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
         unique: true,
         validate: {
-            is: /^\+?[1-9]\d{1,14}$/, // Validates international phone number format
+            is: /^\+?[0-9]{10,15}$/, // Validates phone number format (10-15 digits)
         }
     },
     age: {
@@ -40,11 +40,10 @@ User.init({
     },
     email: {
         type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
+        allowNull: true,
+        unique: false, // Removed unique constraint to allow multiple NULL values in SQLite
         validate: {
-            isEmail: true,
-            notEmpty: true
+            isEmail: true
         }
     },
     password: {

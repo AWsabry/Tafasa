@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:tafasa/core/theme/app_theme.dart';
 import 'package:tafasa/features/register/presentation/view/register_screen.dart';
 
@@ -142,16 +141,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.primaryPurple.withOpacity(0.70),
-                AppTheme.primaryOrange.withOpacity(0.60),
-              ],
-            ),
-          ),
+          color: Colors.grey[200],
           child: Stack(
             children: [
               // Animated particles
@@ -212,7 +202,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 60),
+                          const SizedBox(height: 30),
 
                           // Logo with animation
                           AnimatedBuilder(
@@ -232,46 +222,15 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                 return Container(
                                   width: 180,
                                   height: 180,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        AppTheme.primaryPurple,
-                                        AppTheme.primaryOrange,
-                                        AppTheme.primaryPurple.withOpacity(0.8),
-                                      ],
-                                    ),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: AppTheme.primaryPurple
-                                            .withOpacity(
-                                              0.3 +
-                                                  _pulseController.value * 0.2,
-                                            ),
-                                        blurRadius:
-                                            40 + _pulseController.value * 20,
-                                        spreadRadius: 5,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Container(
-                                    margin: const EdgeInsets.all(4),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: Colors.white.withOpacity(0.1),
-                                    ),
-                                    child: Center(
-                                      child: SvgPicture.asset(
-                                        'assets/icons/TAFASA WHITE LOGO.svg',
+
+                                  child: Center(
+                                    child: ClipRRect(
+                                      borderRadius: BorderRadius.circular(100),
+                                      child: Image.asset(
+                                        'assets/images/Tafasa Logo.png',
                                         height: 140,
                                         width: 140,
                                         fit: BoxFit.cover,
-                                        colorFilter: const ColorFilter.mode(
-                                          Colors.white,
-                                          BlendMode.srcIn,
-                                        ),
                                       ),
                                     ),
                                   ),
@@ -305,7 +264,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                     style: TextStyle(
                                       fontFamily: 'FFKhallab',
                                       fontSize: 20,
-                                      color: Colors.white.withOpacity(0.8),
+                                      color: Colors.grey[700],
                                       fontWeight: FontWeight.w500,
                                       letterSpacing: 1,
                                     ),
@@ -329,22 +288,22 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   _buildFeatureChip(
                                     Icons.restaurant,
                                     'وصفات متنوعة',
-                                    AppTheme.primaryPurple,
+                                    Colors.white,
                                   ),
                                   _buildFeatureChip(
                                     Icons.fastfood,
                                     'أكلات مصرية',
-                                    AppTheme.primaryPurple,
+                                    Colors.white,
                                   ),
                                   _buildFeatureChip(
                                     Icons.favorite,
                                     'مفضلاتك',
-                                    AppTheme.primaryPurple,
+                                    Colors.white,
                                   ),
                                   _buildFeatureChip(
                                     Icons.lightbulb,
                                     'اقتراحات ذكية',
-                                    AppTheme.primaryPurple,
+                                    Colors.white,
                                   ),
                                 ],
                               ),
@@ -361,10 +320,10 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: Container(
                                 padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.05),
+                                  color: Colors.grey[100],
                                   borderRadius: BorderRadius.circular(20),
                                   border: Border.all(
-                                    color: Colors.white.withOpacity(0.1),
+                                    color: Colors.grey[300]!,
                                     width: 1,
                                   ),
                                 ),
@@ -374,7 +333,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                                   style: TextStyle(
                                     fontFamily: 'FFKhallab',
                                     fontSize: 16,
-                                    color: Colors.white.withOpacity(0.7),
+                                    color: Colors.grey[700],
                                     height: 1.6,
                                   ),
                                 ),
@@ -392,12 +351,8 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(30),
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppTheme.primaryPurple,
-                                      AppTheme.primaryOrange,
-                                    ],
-                                  ),
+                                  color: AppTheme.primaryPurple,
+
                                   boxShadow: [
                                     BoxShadow(
                                       color: AppTheme.primaryPurple.withOpacity(
@@ -477,7 +432,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(height: 60),
+                          const SizedBox(height: 30),
                         ],
                       ),
                     ),
@@ -495,20 +450,20 @@ class _WelcomeScreenState extends State<WelcomeScreen>
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withOpacity(0.3), width: 1),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, color: color, size: 20),
+          Icon(icon, color: Colors.grey[700], size: 20),
           const SizedBox(width: 8),
           Text(
             label,
             style: TextStyle(
               fontFamily: 'FFKhallab',
-              color: Colors.white.withOpacity(0.9),
+              color: Colors.grey[700],
               fontWeight: FontWeight.w600,
               fontSize: 14,
             ),

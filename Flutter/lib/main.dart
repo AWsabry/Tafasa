@@ -17,7 +17,7 @@ class FancyMommyMealsApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Fancy Mommy Meals',
+      title: 'Tafasa - طفاسة',
       theme: AppTheme.lightTheme,
       home: const WelcomeScreen(),
       debugShowCheckedModeBanner: false,

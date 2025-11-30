@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tafasa/core/managers/snack_bar_manager.dart';
 import 'package:tafasa/core/services/locator/service_locator.dart';
 import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/core/utils/logger.dart';
 import 'package:tafasa/features/login/presentation/view/login_screen.dart';
 import 'package:tafasa/features/register/data/model/register_model.dart';
 import 'package:tafasa/features/register/presentation/controller/register_state.dart';
@@ -175,22 +176,22 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
     return AnimatedBuilder(
       animation: _particlesController,
       builder: (context, child) {
-        final offset = sin((_particlesController.value + delay) * 2 * pi) * 20;
+        final offset = sin((_particlesController.value + delay) * 2 * pi) * 25;
         final opacity =
             (sin((_particlesController.value + delay) * 2 * pi) + 1) / 2;
         return Positioned(
           left: left,
           top: top + offset,
           child: Opacity(
-            opacity: opacity * 0.25,
+            opacity: opacity * 0.3,
             child: Container(
-              width: 6,
-              height: 6,
+              width: 8,
+              height: 8,
               decoration: BoxDecoration(
                 color: color,
                 shape: BoxShape.circle,
                 boxShadow: [
-                  BoxShadow(color: color.withOpacity(0.5), blurRadius: 8),
+                  BoxShadow(color: color.withOpacity(0.5), blurRadius: 10),
                 ],
               ),
             ),
@@ -239,12 +240,18 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
     final state = cubit.state;
 
     if (_formKey.currentState!.validate() && state.acceptTerms) {
+      Logger.debug(_nameController.text);
+      Logger.debug(_emailController.text);
+      Logger.debug(_passwordController.text);
+      Logger.debug(_phoneController.text);
+      Logger.debug(_ageController.text);
+
       await cubit.register(
         RegisterModel(
           username: _nameController.text,
-          email: _emailController.text,
+          email: _emailController.text.isEmpty ? null : _emailController.text,
           password: _passwordController.text,
-          phoneNumber: _phoneController.text,
+          phoneNumber: "+2${_phoneController.text}",
           age: int.parse(_ageController.text),
         ),
       );
@@ -266,38 +273,57 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.primaryPurple.withOpacity(0.70),
-                AppTheme.primaryOrange.withOpacity(0.60),
-              ],
-            ),
-          ),
+          color: Colors.grey[200],
           child: Stack(
             children: [
               // Animated particles
-              _buildFloatingParticle(40, 80, 0, AppTheme.primaryOrange),
+              _buildFloatingParticle(
+                60,
+                100,
+                0,
+                AppTheme.primaryPurple.withOpacity(0.5),
+              ),
+              _buildFloatingParticle(
+                screenWidth - 80,
+                150,
+                0.2,
+                AppTheme.primaryOrange.withOpacity(0.5),
+              ),
+              _buildFloatingParticle(
+                40,
+                300,
+                0.4,
+                AppTheme.primaryPurple.withOpacity(0.4),
+              ),
               _buildFloatingParticle(
                 screenWidth - 60,
-                120,
-                0.2,
-                const Color(0xFF3B8A00),
-              ),
-              _buildFloatingParticle(50, 250, 0.4, AppTheme.primaryPurple),
-              _buildFloatingParticle(
-                screenWidth - 70,
-                350,
+                400,
                 0.6,
-                Colors.purple.shade300,
+                AppTheme.primaryOrange.withOpacity(0.6),
+              ),
+              _buildFloatingParticle(
+                100,
+                500,
+                0.8,
+                AppTheme.primaryPurple.withOpacity(0.3),
+              ),
+              _buildFloatingParticle(
+                screenWidth - 120,
+                600,
+                0.3,
+                AppTheme.primaryOrange.withOpacity(0.4),
               ),
               _buildFloatingParticle(
                 80,
                 screenHeight - 200,
-                0.8,
-                Colors.amber.shade300,
+                0.5,
+                AppTheme.primaryPurple.withOpacity(0.6),
+              ),
+              _buildFloatingParticle(
+                screenWidth - 100,
+                screenHeight - 150,
+                0.7,
+                AppTheme.primaryOrange.withOpacity(0.5),
               ),
 
               SafeArea(
@@ -342,17 +368,14 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                                     height: 90,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          AppTheme.primaryOrange,
-                                          AppTheme.primaryPurple,
-                                        ],
-                                      ),
+                                      color: AppTheme.primaryPurple,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: Colors.orange.withOpacity(
-                                            0.3 + _glowController.value * 0.2,
-                                          ),
+                                          color: AppTheme.primaryPurple
+                                              .withOpacity(
+                                                0.3 +
+                                                    _glowController.value * 0.2,
+                                              ),
                                           blurRadius:
                                               30 + _glowController.value * 15,
                                           spreadRadius: 3,
@@ -368,12 +391,13 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                                 },
                               ),
                               const SizedBox(height: 20),
-                              const Text(
+                              Text(
                                 'إنشاء حساب جديد',
                                 style: TextStyle(
+                                  fontFamily: 'FFKhallab',
                                   fontSize: 32,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                  color: Colors.grey[800],
                                   letterSpacing: 1,
                                 ),
                               ),
@@ -381,8 +405,9 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                               Text(
                                 'انضم إلينا الآن!',
                                 style: TextStyle(
+                                  fontFamily: 'FFKhallab',
                                   fontSize: 16,
-                                  color: Colors.white70,
+                                  color: Colors.grey[600],
                                 ),
                               ),
                             ],
@@ -492,8 +517,8 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                             child: RichText(
                               text: TextSpan(
                                 text: 'لديك حساب بالفعل؟ ',
-                                style: const TextStyle(
-                                  color: Colors.white70,
+                                style: TextStyle(
+                                  color: Colors.grey[600],
                                   fontSize: 16,
                                 ),
                                 children: [
@@ -502,7 +527,7 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                                     style: TextStyle(
                                       fontSize: 18,
                                       color: AppTheme.primaryPurple,
-                                      // fontWeight: FontWeigh,
+                                      fontWeight: FontWeight.bold,
                                       decoration: TextDecoration.underline,
                                     ),
                                   ),
@@ -534,8 +559,8 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(4),
             color: index <= currentStep
-                ? const Color(0xFF3B8A00)
-                : Colors.white.withOpacity(0.2),
+                ? AppTheme.primaryPurple
+                : Colors.grey[400],
           ),
         );
       }),
@@ -551,9 +576,10 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
           Text(
             'المعلومات الشخصية',
             style: TextStyle(
+              fontFamily: 'FFKhallab',
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: Colors.grey[800],
             ),
           ),
           const SizedBox(height: 24),
@@ -602,24 +628,19 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
           Text(
             'البريد الإلكتروني',
             style: TextStyle(
+              fontFamily: 'FFKhallab',
               fontSize: 20,
               fontWeight: FontWeight.bold,
-              color: Colors.white,
+              color: Colors.grey[800],
             ),
           ),
           const SizedBox(height: 24),
           _buildTextField(
             controller: _emailController,
-            hint: 'البريد الإلكتروني',
+            hint: 'البريد الإلكتروني (اختياري)',
             icon: Icons.email_outlined,
             keyboardType: TextInputType.emailAddress,
             validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return 'من فضلك أدخل البريد الإلكتروني';
-              }
-              if (!value!.contains('@')) {
-                return 'البريد الإلكتروني غير صحيح';
-              }
               return null;
             },
           ),
@@ -639,9 +660,10 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
               Text(
                 'كلمة المرور',
                 style: TextStyle(
+                  fontFamily: 'FFKhallab',
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.grey[800],
                 ),
               ),
               const SizedBox(height: 24),
@@ -658,7 +680,7 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                     state.obscurePassword
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.grey[600],
                   ),
                 ),
                 validator: (value) {
@@ -687,7 +709,7 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                     state.obscureConfirmPassword
                         ? Icons.visibility_off_outlined
                         : Icons.visibility_outlined,
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.grey[600],
                   ),
                 ),
                 validator: (value) {
@@ -706,13 +728,13 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: state.acceptTerms
-                      ? const Color(0xFF3B8A00).withOpacity(0.1)
-                      : Colors.white.withOpacity(0.05),
+                      ? AppTheme.primaryPurple.withOpacity(0.1)
+                      : Colors.grey[100],
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
                     color: state.acceptTerms
-                        ? const Color(0xFF3B8A00)
-                        : Colors.white.withOpacity(0.1),
+                        ? AppTheme.primaryPurple
+                        : Colors.grey[300]!,
                     width: 1,
                   ),
                 ),
@@ -728,8 +750,8 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                             value ?? false,
                           );
                         },
-                        activeColor: const Color(0xFF3B8A00),
-                        side: BorderSide(color: Colors.white.withOpacity(0.5)),
+                        activeColor: AppTheme.primaryPurple,
+                        side: BorderSide(color: Colors.grey[400]!),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -737,7 +759,7 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                       child: RichText(
                         text: TextSpan(
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
+                            color: Colors.grey[700],
                             fontSize: 13,
                           ),
                           children: [
@@ -745,7 +767,7 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                             TextSpan(
                               text: 'الشروط والأحكام',
                               style: TextStyle(
-                                color: AppTheme.primaryOrange,
+                                color: AppTheme.primaryPurple,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),
@@ -754,7 +776,7 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                             TextSpan(
                               text: 'سياسة الخصوصية',
                               style: TextStyle(
-                                color: AppTheme.primaryOrange,
+                                color: AppTheme.primaryPurple,
                                 fontWeight: FontWeight.bold,
                                 decoration: TextDecoration.underline,
                               ),
@@ -794,23 +816,25 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(16),
-          gradient: LinearGradient(
-            colors: [
-              Colors.white.withOpacity(0.05),
-              Colors.white.withOpacity(0.02),
-            ],
-          ),
-          border: Border.all(color: Colors.white.withOpacity(0.1), width: 1),
+          color: Colors.white,
+          border: Border.all(color: Colors.grey[300]!, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.05),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: TextFormField(
           controller: controller,
           obscureText: obscureText,
           keyboardType: keyboardType,
           validator: validator,
-          style: TextStyle(color: Colors.white),
+          style: TextStyle(color: Colors.grey[800]),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: TextStyle(color: Colors.white.withOpacity(0.5)),
+            hintStyle: TextStyle(color: Colors.grey[400], fontSize: 12),
             prefixIcon: Icon(icon, color: AppTheme.primaryOrange),
             suffixIcon: suffixIcon,
             border: OutlineInputBorder(
@@ -833,11 +857,17 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
       duration: const Duration(milliseconds: 300),
       height: 56,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        gradient: LinearGradient(
-          colors: [AppTheme.primaryPurple, AppTheme.primaryOrange],
-        ),
-        boxShadow: [BoxShadow(color: AppTheme.primaryPurple.withOpacity(0.4))],
+        borderRadius: BorderRadius.circular(30),
+        color: AppTheme.primaryPurple,
+
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.primaryPurple.withOpacity(0.4),
+
+            blurRadius: 25,
+            offset: const Offset(0, 12),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -857,8 +887,9 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
                 : Text(
                     text,
                     style: const TextStyle(
+                      fontFamily: 'FFKhallab',
                       color: Colors.white,
-                      fontSize: 17,
+                      fontSize: 18,
                       fontWeight: FontWeight.bold,
                       letterSpacing: 1,
                     ),
@@ -878,7 +909,8 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
       height: 56,
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withOpacity(0.3), width: 2),
+        color: Colors.white,
+        border: Border.all(color: AppTheme.primaryPurple, width: 2),
       ),
       child: Material(
         color: Colors.transparent,
@@ -889,8 +921,9 @@ class _RegisterScreenViewState extends State<_RegisterScreenView>
             child: Text(
               text,
               style: TextStyle(
-                color: Colors.white.withOpacity(0.9),
-                fontSize: 17,
+                fontFamily: 'FFKhallab',
+                color: AppTheme.primaryPurple,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 1,
               ),

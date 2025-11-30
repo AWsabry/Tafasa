@@ -9,8 +9,9 @@ import 'package:tafasa/core/utils/logger.dart';
 import 'package:tafasa/features/home/data/model/categories_model.dart';
 import 'package:tafasa/features/suggestions/presentation/controller/suggestions_cubit.dart';
 import 'package:tafasa/features/suggestions/presentation/view/suggestions_screen.dart';
+import 'package:tafasa/widgets/category_card_option2.dart';
 
-import '../../../../widgets/category_card.dart';
+import '../../../about/presentation/view/about_screen.dart';
 import '../../../favorites/presentation/view/favorites_screen.dart';
 import '../controller/home_cubit.dart';
 
@@ -103,7 +104,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
           ),
         );
       },
-      child: CategoryCard(
+      child: CategoryCardOption2(
         category: category.name,
         onTap: () => Navigator.push(
           context,
@@ -142,14 +143,14 @@ class _HomeScreenViewState extends State<_HomeScreenView>
     return AnimatedBuilder(
       animation: _particlesController,
       builder: (context, child) {
-        final offset = sin((_particlesController.value + delay) * 2 * pi) * 20;
+        final offset = sin((_particlesController.value + delay) * 2 * pi) * 25;
         final opacity =
             (sin((_particlesController.value + delay) * 2 * pi) + 1) / 2;
         return Positioned(
           left: left,
           top: top + offset,
           child: Opacity(
-            opacity: opacity * 0.25,
+            opacity: opacity * 0.3,
             child: Container(
               width: 8,
               height: 8,
@@ -175,16 +176,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
       textDirection: TextDirection.rtl,
       child: Scaffold(
         body: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                AppTheme.primaryPurple.withOpacity(0.50),
-                AppTheme.primaryOrange.withOpacity(0.40),
-              ],
-            ),
-          ),
+          color: Colors.white,
           child: SafeArea(
             child: Stack(
               children: [
@@ -236,15 +228,16 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                           vertical: 24,
                           horizontal: 20,
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
-                          border: Border(
-                            bottom: BorderSide(
-                              color: Colors.white.withOpacity(0.1),
-                              width: 1,
-                            ),
-                          ),
-                        ),
+                        // decoration: BoxDecoration(
+                        //   color: Colors.white,
+                        //   boxShadow: [
+                        //     BoxShadow(
+                        //       color: Colors.black.withOpacity(0.05),
+                        //       blurRadius: 10,
+                        //       offset: const Offset(0, 2),
+                        //     ),
+                        //   ],
+                        // ),
                         child: Column(
                           children: [
                             Row(
@@ -258,16 +251,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                       height: 80,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            AppTheme.primaryPurple.withOpacity(
-                                              0.3,
-                                            ),
-                                            AppTheme.primaryOrange.withOpacity(
-                                              0.3,
-                                            ),
-                                          ],
-                                        ),
+                                        color: AppTheme.primaryPurple,
                                         boxShadow: [
                                           BoxShadow(
                                             color: AppTheme.primaryPurple
@@ -324,7 +308,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                               'اكتشف وصفات مصرية أصيلة',
                               style: TextStyle(
                                 fontFamily: 'FFKhallab',
-                                color: Colors.white.withOpacity(0.7),
+                                color: Colors.grey[700],
                                 fontSize: 15,
                                 fontWeight: FontWeight.w500,
                                 letterSpacing: 0.5,
@@ -355,7 +339,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                     'جاري تحميل الفئات...',
                                     style: TextStyle(
                                       fontFamily: 'FFKhallab',
-                                      color: Colors.white.withOpacity(0.7),
+                                      color: Colors.grey[700],
                                       fontSize: 16,
                                     ),
                                   ),
@@ -382,7 +366,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       fontFamily: 'FFKhallab',
-                                      color: Colors.white.withOpacity(0.7),
+                                      color: Colors.grey[700],
                                       fontSize: 16,
                                     ),
                                   ),
@@ -419,7 +403,10 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                               child: ScaleTransition(
                                 scale: _scaleAnimation,
                                 child: GridView.builder(
-                                  padding: const EdgeInsets.all(20),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 5,
+                                  ),
                                   gridDelegate:
                                       const SliverGridDelegateWithFixedCrossAxisCount(
                                         crossAxisCount: 2,
@@ -465,13 +452,14 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                 : 0;
             return Container(
               decoration: BoxDecoration(
-                color: AppTheme.primaryPurple.withOpacity(0.95),
-                border: Border(
-                  top: BorderSide(
-                    color: Colors.white.withOpacity(0.1),
-                    width: 1,
+                color: Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, -2),
                   ),
-                ),
+                ],
               ),
               child: SafeArea(
                 child: Padding(
@@ -557,6 +545,42 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                           ).then((_) => context.read<HomeCubit>().resetIndex());
                         },
                       ),
+                      _buildNavItem(
+                        icon: Icons.info_rounded,
+                        label: 'من نحن',
+                        isSelected: currentIndex == 3,
+                        onTap: () {
+                          context.read<HomeCubit>().setCurrentIndex(3);
+                          Navigator.push(
+                            context,
+                            PageRouteBuilder(
+                              pageBuilder: (_, __, ___) =>
+                                  const AboutScreen(),
+                              transitionDuration: const Duration(
+                                milliseconds: 600,
+                              ),
+                              transitionsBuilder: (_, animation, __, child) {
+                                return FadeTransition(
+                                  opacity: animation,
+                                  child: SlideTransition(
+                                    position:
+                                        Tween<Offset>(
+                                          begin: const Offset(0, 0.3),
+                                          end: Offset.zero,
+                                        ).animate(
+                                          CurvedAnimation(
+                                            parent: animation,
+                                            curve: Curves.easeOutCubic,
+                                          ),
+                                        ),
+                                    child: child,
+                                  ),
+                                );
+                              },
+                            ),
+                          ).then((_) => context.read<HomeCubit>().resetIndex());
+                        },
+                      ),
                     ],
                   ),
                 ),
@@ -605,7 +629,7 @@ class _HomeScreenViewState extends State<_HomeScreenView>
           children: [
             Icon(
               icon,
-              color: isSelected ? Colors.white : Colors.white.withOpacity(0.5),
+              color: isSelected ? Colors.white : Colors.grey[600],
               size: 24,
             ),
             if (isSelected) ...[

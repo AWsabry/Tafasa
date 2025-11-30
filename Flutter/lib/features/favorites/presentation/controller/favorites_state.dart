@@ -17,11 +17,12 @@ class FavoritesLoading extends FavoritesState {
 
 class FavoritesLoaded extends FavoritesState {
   final List<RecipeModel> favorites;
+  final String? selectedCategory;
 
-  const FavoritesLoaded(this.favorites);
+  const FavoritesLoaded(this.favorites, {this.selectedCategory});
 
   @override
-  List<Object?> get props => [favorites];
+  List<Object?> get props => [favorites, selectedCategory];
 }
 
 class FavoritesError extends FavoritesState {
