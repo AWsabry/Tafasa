@@ -37,14 +37,11 @@ export const validateMeal = [
         .withMessage('Meal name is required')
         .isLength({ max: 100 })
         .withMessage('Meal name must not exceed 100 characters'),
-    body('price')
-        .isFloat({ min: 0 })
-        .withMessage('Price must be a positive number'),
     body('categoryId')
-        .isInt()
+        .isMongoId()
         .withMessage('Valid category ID is required'),
     body('image')
-        .optional()
+        .optional({ checkFalsy: true })
         .isURL()
         .withMessage('Image must be a valid URL'),
 ];

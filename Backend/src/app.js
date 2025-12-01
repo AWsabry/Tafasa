@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import express from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import sequelize from './config/database.js';
+import connectDatabase from './config/database.js';
 import './models/Category.js';
 import './models/Meal.js';
 import './models/User.js';
@@ -30,10 +30,8 @@ app.use(cors({
 }));
 app.use(morgan('dev'));
 
-// Sync database
-sequelize.sync()
-    .then(() => console.log('Database synced'))
-    .catch(err => console.error('Error syncing database:', err));
+// Connect database
+connectDatabase();
 
 app.use('/', routes);
 

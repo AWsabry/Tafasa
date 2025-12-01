@@ -77,16 +77,15 @@ const parsePreparationSteps = (value) => {
 class MealController {
     static async createMeal(req, res) {
         try {
-            const { name, description, price, image, categoryId, ingredients, preparationSteps } = req.body;
+            const { name, description, image, categoryId, ingredients, preparationSteps } = req.body;
             
-            if (!name || !price || !categoryId) {
-                return res.status(400).json({ error: 'Name, price, and category are required' });
+            if (!name || !categoryId) {
+                return res.status(400).json({ error: 'Name and category are required' });
             }
 
             const meal = await MealService.createMeal({
                 name,
                 description,
-                price,
                 image,
                 categoryId,
                 ingredients: ingredients || [],
@@ -197,6 +196,36 @@ class MealController {
         }
     }
 
+    static async updateMeal(req, res) {
+        try {
+            const { id } = req.params;
+            const { name, description, image, categoryId, ingredients, preparationSteps } = req.body;
+
+            if (!name || !categoryId) {
+                return res.status(400).json({ error: 'Name and category are required' });
+            }
+
+            const meal = await MealService.updateMeal(id, {
+                name,
+                description,
+                image,
+                categoryId,
+                ingredients: ingredients || [],
+                preparationSteps: preparationSteps || []
+            });
+
+            res.json({
+                message: 'Meal updated successfully',
+                meal
+            });
+        } catch (error) {
+            if (error.message === 'Meal not found' || error.message === 'Category not found') {
+                return res.status(404).json({ error: error.message });
+            }
+            res.status(400).json({ error: error.message });
+        }
+    }
+
     static async updateIngredients(req, res) {
         try {
             const { id } = req.params;
@@ -262,7 +291,6 @@ class MealController {
 
                 try {
                     const name = String(row['name'] || '').trim();
-                    const priceRaw = row['price'];
                     const description = row['description'] ? String(row['description']).trim() : null;
                     const image = row['image'] ? String(row['image']).trim() : null;
                     const categoryIdRaw = row['categoryid'];
@@ -272,26 +300,13 @@ class MealController {
                         throw new Error('Name is required');
                     }
 
-                    if (priceRaw === undefined || priceRaw === null || String(priceRaw).trim() === '') {
-                        throw new Error('Price is required');
-                    }
-
-                    const price = Number(priceRaw);
-                    if (Number.isNaN(price)) {
-                        throw new Error('Price must be a valid number');
-                    }
-
                     let categoryId = categoryIdRaw !== undefined && categoryIdRaw !== null && String(categoryIdRaw).trim() !== ''
-                        ? Number(categoryIdRaw)
+                        ? String(categoryIdRaw).trim()
                         : null;
-
-                    if (categoryId !== null && Number.isNaN(categoryId)) {
-                        throw new Error('CategoryId must be a valid number');
-                    }
 
                     if (!categoryId && categoryName) {
                         const category = await Category.findOne({
-                            where: { name: categoryName }
+                            name: categoryName
                         });
                         if (!category) {
                             throw new Error(`Category with name "${categoryName}" was not found`);
@@ -309,7 +324,6 @@ class MealController {
                     const meal = await MealService.createMeal({
                         name,
                         description,
-                        price,
                         image,
                         categoryId,
                         ingredients,
@@ -334,6 +348,20 @@ class MealController {
                 meals: createdMeals,
                 errors
             });
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async searchMeals(req, res) {
+        try {
+            const { query } = req.query;
+            const userId = req.user ? req.user.id : null;
+            if (!query || !query.trim()) {
+                return res.status(400).json({ error: 'Query is required' });
+            }
+            const meals = await MealService.searchMeals(query.trim(), userId);
+            res.json({ meals });
         } catch (error) {
             res.status(500).json({ error: error.message });
         }

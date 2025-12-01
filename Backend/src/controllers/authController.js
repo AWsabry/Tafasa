@@ -3,7 +3,7 @@ import AuthService from '../services/authService.js';
 class AuthController {
     static async register(req, res) {
         try {
-            const { username, email, password, phoneNumber, age } = req.body;
+            const { username, email, password, phoneNumber, age, role } = req.body;
 
             console.log('Registration request body:', {
                 username,
@@ -17,7 +17,7 @@ class AuthController {
                 return res.status(400).json({ error: 'Username, phone number, and password are required' });
             }
 
-            const { user, token } = await AuthService.register(username, email, password, phoneNumber, age);
+            const { user, token } = await AuthService.register(username, email, password, phoneNumber, age, role);
 
             res.status(201).json({
                 message: 'User registered successfully',
@@ -26,7 +26,8 @@ class AuthController {
                     username: user.username,
                     email: user.email,
                     phoneNumber: user.phoneNumber,
-                    age: user.age
+                    age: user.age,
+                    role: user.role
                 },
                 token
             });
@@ -52,7 +53,8 @@ class AuthController {
                     username: user.username,
                     email: user.email,
                     phoneNumber: user.phoneNumber,
-                    age: user.age
+                    age: user.age,
+                    role: user.role
                 },
                 token
             });
@@ -112,6 +114,7 @@ class AuthController {
                 email: user.email,
                 phoneNumber: user.phoneNumber,
                 age: user.age,
+                role: user.role,
                 createdAt: user.createdAt
             };
 
@@ -132,6 +135,23 @@ class AuthController {
         } catch (error) {
             if (error.message === 'User not found') {
                 return res.status(404).json({ error: error.message });
+            }
+            res.status(500).json({ error: error.message });
+        }
+    }
+
+    static async updateUserRole(req, res) {
+        try {
+            const { id } = req.params;
+            const { role } = req.body;
+            const updated = await AuthService.updateUserRole(id, role);
+            res.json({ message: 'User role updated', user: updated });
+        } catch (error) {
+            if (error.message === 'User not found') {
+                return res.status(404).json({ error: error.message });
+            }
+            if (error.message === 'Invalid role') {
+                return res.status(400).json({ error: error.message });
             }
             res.status(500).json({ error: error.message });
         }

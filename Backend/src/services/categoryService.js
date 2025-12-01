@@ -13,12 +13,7 @@ class CategoryService {
 
     static async getAllCategories() {
         try {
-            const categories = await Category.findAll({
-                include: [{
-                    model: Meal,
-                    attributes: ['id', 'name', 'price']
-                }]
-            });
+            const categories = await Category.find();
             return categories;
         } catch (error) {
             throw error;
@@ -27,16 +22,14 @@ class CategoryService {
 
     static async getCategoryById(id) {
         try {
-            const category = await Category.findByPk(id, {
-                include: [{
-                    model: Meal,
-                    attributes: ['id', 'name', 'description', 'price', 'image']
-                }]
-            });
+            const category = await Category.findById(id);
             if (!category) {
                 throw new Error('Category not found');
             }
-            return category;
+            const meals = await Meal.find({ categoryId: id }).select('id name description image');
+            const categoryObj = category.toJSON();
+            categoryObj.Meals = meals;
+            return categoryObj;
         } catch (error) {
             throw error;
         }
@@ -44,22 +37,17 @@ class CategoryService {
 
     static async deleteCategory(id) {
         try {
-            const category = await Category.findByPk(id, {
-                include: [{
-                    model: Meal
-                }]
-            });
-            
+            const meals = await Meal.find({ categoryId: id }).limit(1);
+            if (meals.length > 0) {
+                throw new Error('Cannot delete category with associated meals. Please delete or reassign meals first.');
+            }
+
+            const category = await Category.findById(id);
             if (!category) {
                 throw new Error('Category not found');
             }
 
-            // Check if category has associated meals
-            if (category.Meals && category.Meals.length > 0) {
-                throw new Error('Cannot delete category with associated meals. Please delete or reassign meals first.');
-            }
-
-            await category.destroy();
+            await category.deleteOne();
             return { message: 'Category deleted successfully' };
         } catch (error) {
             throw error;

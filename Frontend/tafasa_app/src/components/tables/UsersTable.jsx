@@ -1,6 +1,6 @@
 import React from 'react';
 
-const UsersTable = ({ users, onDelete }) => {
+const UsersTable = ({ users, onDelete, onRoleChange }) => {
   return (
     <div className="card overflow-hidden p-0 w-full">
       <div className="overflow-x-auto w-full">
@@ -12,6 +12,7 @@ const UsersTable = ({ users, onDelete }) => {
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Email</th>
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Phone</th>
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Age</th>
+              <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Role</th>
               <th className="py-3.5 px-3 text-left text-sm font-semibold text-[var(--color-text-secondary)]">Created At</th>
               <th className="py-3.5 pl-3 pr-4 text-right text-sm font-semibold text-[var(--color-text-secondary)]">Actions</th>
             </tr>
@@ -20,7 +21,7 @@ const UsersTable = ({ users, onDelete }) => {
             {users?.map((user) => (
               <tr key={user.id} className="hover:bg-[var(--color-bg-tertiary)] transition-colors">
                 <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm">
-                  <span className="bg-[var(--color-primary)] bg-opacity-10 text-[var(--color-primary)] px-2.5 py-0.5 rounded-full font-medium">
+                  <span className="px-2.5 py-0.5 rounded-full font-medium">
                     #{user.id}
                   </span>
                 </td>
@@ -29,13 +30,22 @@ const UsersTable = ({ users, onDelete }) => {
                 <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">{user.phoneNumber || '-'}</td>
                 <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">{user.age || '-'}</td>
                 <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">
+                  <select
+                    value={user.role || 'user'}
+                    onChange={(e) => onRoleChange && onRoleChange(user.id, e.target.value)}
+                    className="input py-1 px-2 text-sm"
+                  >
+                    <option value="user">User</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </td>
+                <td className="whitespace-nowrap py-4 px-3 text-sm text-[var(--color-text-secondary)]">
                   {new Date(user.createdAt).toLocaleDateString()}
                 </td>
                 <td className="whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm">
-                  <button className="btn btn-secondary py-1 px-3 mr-2">Edit</button>
                   <button 
                     onClick={() => onDelete && onDelete(user.id)} 
-                    className="btn bg-red-500/10 text-red-400 hover:bg-red-500/20 py-1 px-3"
+                    className="btn btn-danger-ghost btn-compact"
                   >
                     Delete
                   </button>
@@ -56,8 +66,8 @@ const UsersTable = ({ users, onDelete }) => {
           <span className="text-sm text-[var(--color-text-secondary)]">entries</span>
         </div>
         <div className="flex items-center gap-2">
-          <button disabled className="btn py-1 px-3 bg-[var(--color-bg-tertiary)] text-[var(--color-text-secondary)]">Previous</button>
-          <button className="btn btn-primary py-1 px-3">Next</button>
+          <button disabled className="btn btn-surface btn-compact text-[var(--color-text-secondary)]">Previous</button>
+          <button className="btn btn-primary btn-compact">Next</button>
         </div>
       </div>
     </div>

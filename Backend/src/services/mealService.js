@@ -1,62 +1,33 @@
+import mongoose from 'mongoose';
 import Meal from '../models/Meal.js';
 import Category from '../models/Category.js';
 import Favorite from '../models/Favorite.js';
 
-// Helper function to transform meal response: categoryId becomes an object with id, name, description
-const transformMealResponse = (meal, userId = null) => {
+const transformMeal = (meal, favoriteIds = new Set()) => {
     if (!meal) return meal;
-
-    const mealData = meal.toJSON ? meal.toJSON() : meal;
-    const category = mealData.Category || mealData.category;
-
-    if (category) {
-        mealData.categoryId = {
-            id: category.id,
-            name: category.name,
-            description: category.description || null
+    const obj = meal.toJSON ? meal.toJSON() : meal;
+    if (obj.categoryId && typeof obj.categoryId === 'object') {
+        obj.categoryId = {
+            id: obj.categoryId.id || obj.categoryId._id?.toString(),
+            name: obj.categoryId.name,
+            description: obj.categoryId.description || null
         };
-        // Remove the nested Category object
-        delete mealData.Category;
-        delete mealData.category;
     }
-
-    // Add isFavorite attribute based on Favorites relation
-    if (userId !== null && mealData.Favorites) {
-        mealData.isFavorite = mealData.Favorites.length > 0;
-        delete mealData.Favorites;
-    } else if (userId === null) {
-        // If no userId provided, set isFavorite to false
-        mealData.isFavorite = false;
-    }
-
-    return mealData;
-};
-
-const transformMealsResponse = (meals, userId = null) => {
-    if (Array.isArray(meals)) {
-        return meals.map(meal => transformMealResponse(meal, userId));
-    }
-    return transformMealResponse(meals, userId);
+    obj.isFavorite = favoriteIds.has(obj.id);
+    return obj;
 };
 
 class MealService {
     static async createMeal(data) {
         try {
-            // Check if category exists
-            const category = await Category.findByPk(data.categoryId);
+            const category = await Category.findById(data.categoryId);
             if (!category) {
                 throw new Error('Category not found');
             }
 
             const meal = await Meal.create(data);
-            // Reload with category to include full category data
-            const mealWithCategory = await Meal.findByPk(meal.id, {
-                include: [{
-                    model: Category,
-                    attributes: ['id', 'name', 'description']
-                }]
-            });
-            return transformMealResponse(mealWithCategory);
+            const populated = await Meal.findById(meal.id).populate('categoryId', 'id name description');
+            return transformMeal(populated);
         } catch (error) {
             throw error;
         }
@@ -64,27 +35,13 @@ class MealService {
 
     static async getAllMeals(userId = null) {
         try {
-            const includeOptions = [
-                {
-                    model: Category,
-                    attributes: ['id', 'name', 'description']
-                }
-            ];
-
-            // Add Favorites relation if userId is provided
+            const meals = await Meal.find().populate('categoryId', 'id name description');
+            let favoriteIds = new Set();
             if (userId) {
-                includeOptions.push({
-                    model: Favorite,
-                    attributes: ['id'],
-                    where: { userId },
-                    required: false
-                });
+                const favs = await Favorite.find({ userId, mealId: { $in: meals.map(m => m.id) } }).select('mealId');
+                favoriteIds = new Set(favs.map(f => f.mealId.toString()));
             }
-
-            const meals = await Meal.findAll({
-                include: includeOptions
-            });
-            return transformMealsResponse(meals, userId);
+            return meals.map((m) => transformMeal(m, favoriteIds));
         } catch (error) {
             throw error;
         }
@@ -92,30 +49,16 @@ class MealService {
 
     static async getMealById(id, userId = null) {
         try {
-            const includeOptions = [
-                {
-                    model: Category,
-                    attributes: ['id', 'name', 'description']
-                }
-            ];
-
-            // Add Favorites relation if userId is provided
-            if (userId) {
-                includeOptions.push({
-                    model: Favorite,
-                    attributes: ['id'],
-                    where: { userId },
-                    required: false
-                });
-            }
-
-            const meal = await Meal.findByPk(id, {
-                include: includeOptions
-            });
+            const meal = await Meal.findById(id).populate('categoryId', 'id name description');
             if (!meal) {
                 throw new Error('Meal not found');
             }
-            return transformMealResponse(meal, userId);
+            let favoriteIds = new Set();
+            if (userId) {
+                const fav = await Favorite.findOne({ userId, mealId: id });
+                if (fav) favoriteIds.add(id.toString());
+            }
+            return transformMeal(meal, favoriteIds);
         } catch (error) {
             throw error;
         }
@@ -123,28 +66,13 @@ class MealService {
 
     static async getMealsByCategory(categoryId, userId = null) {
         try {
-            const includeOptions = [
-                {
-                    model: Category,
-                    attributes: ['id', 'name', 'description']
-                }
-            ];
-
-            // Add Favorites relation if userId is provided
+            const meals = await Meal.find({ categoryId }).populate('categoryId', 'id name description');
+            let favoriteIds = new Set();
             if (userId) {
-                includeOptions.push({
-                    model: Favorite,
-                    attributes: ['id'],
-                    where: { userId },
-                    required: false
-                });
+                const favs = await Favorite.find({ userId, mealId: { $in: meals.map(m => m.id) } }).select('mealId');
+                favoriteIds = new Set(favs.map(f => f.mealId.toString()));
             }
-
-            const meals = await Meal.findAll({
-                where: { categoryId },
-                include: includeOptions
-            });
-            return transformMealsResponse(meals, userId);
+            return meals.map((m) => transformMeal(m, favoriteIds));
         } catch (error) {
             throw error;
         }
@@ -152,33 +80,17 @@ class MealService {
 
     static async getRandomMeal(userId = null) {
         try {
-            const count = await Meal.count();
-            if (count === 0) {
+            const meals = await Meal.aggregate([{ $sample: { size: 1 } }]);
+            if (!meals.length) {
                 throw new Error('No meals available');
             }
-
-            const includeOptions = [
-                { model: Category, attributes: ['id', 'name', 'description'] }
-            ];
-
-            // Add Favorites relation if userId is provided
+            const mealDoc = await Meal.findById(meals[0]._id).populate('categoryId', 'id name description');
+            let favoriteIds = new Set();
             if (userId) {
-                includeOptions.push({
-                    model: Favorite,
-                    attributes: ['id'],
-                    where: { userId },
-                    required: false
-                });
+                const fav = await Favorite.findOne({ userId, mealId: mealDoc.id });
+                if (fav) favoriteIds.add(mealDoc.id.toString());
             }
-
-            const randomOffset = Math.floor(Math.random() * count);
-            const meals = await Meal.findAll({
-                include: includeOptions,
-                offset: randomOffset,
-                limit: 1
-            });
-
-            return meals[0] ? transformMealResponse(meals[0], userId) : null;
+            return transformMeal(mealDoc, favoriteIds);
         } catch (error) {
             throw error;
         }
@@ -186,34 +98,18 @@ class MealService {
 
     static async getRandomMealByCategory(categoryId, userId = null) {
         try {
-            const count = await Meal.count({ where: { categoryId } });
-            if (count === 0) {
+            const catObjectId = new mongoose.Types.ObjectId(categoryId);
+            const meals = await Meal.aggregate([{ $match: { categoryId: catObjectId } }, { $sample: { size: 1 } }]);
+            if (!meals.length) {
                 throw new Error('No meals available for this category');
             }
-
-            const includeOptions = [
-                { model: Category, attributes: ['id', 'name', 'description'] }
-            ];
-
-            // Add Favorites relation if userId is provided
+            const mealDoc = await Meal.findById(meals[0]._id).populate('categoryId', 'id name description');
+            let favoriteIds = new Set();
             if (userId) {
-                includeOptions.push({
-                    model: Favorite,
-                    attributes: ['id'],
-                    where: { userId },
-                    required: false
-                });
+                const fav = await Favorite.findOne({ userId, mealId: mealDoc.id });
+                if (fav) favoriteIds.add(mealDoc.id.toString());
             }
-
-            const randomOffset = Math.floor(Math.random() * count);
-            const meals = await Meal.findAll({
-                where: { categoryId },
-                include: includeOptions,
-                offset: randomOffset,
-                limit: 1
-            });
-
-            return meals[0] ? transformMealResponse(meals[0], userId) : null;
+            return transformMeal(mealDoc, favoriteIds);
         } catch (error) {
             throw error;
         }
@@ -221,21 +117,17 @@ class MealService {
 
     static async addIngredientToMeal(id, ingredient) {
         try {
-            const meal = await Meal.findByPk(id);
+            const meal = await Meal.findById(id);
             if (!meal) {
                 throw new Error('Meal not found');
             }
 
-            const ingredients = Array.isArray(meal.ingredients) ? meal.ingredients : [];
-            ingredients.push(ingredient);
-            meal.ingredients = ingredients;
+            meal.ingredients = Array.isArray(meal.ingredients) ? meal.ingredients : [];
+            meal.ingredients.push(ingredient);
 
             await meal.save();
-            // reload with category
-            const updated = await Meal.findByPk(id, {
-                include: [{ model: Category, attributes: ['id', 'name', 'description'] }]
-            });
-            return transformMealResponse(updated);
+            const updated = await Meal.findById(id).populate('categoryId', 'id name description');
+            return transformMeal(updated);
         } catch (error) {
             throw error;
         }
@@ -243,31 +135,20 @@ class MealService {
 
     static async updateMealIngredients(id, ingredients) {
         try {
-            const meal = await Meal.findByPk(id);
+            const meal = await Meal.findById(id);
             if (!meal) {
                 throw new Error('Meal not found');
             }
 
-            // Validate that ingredients is an array
             if (!Array.isArray(ingredients)) {
                 throw new Error('Ingredients must be an array');
             }
 
-            // Validate each ingredient
-            ingredients.forEach((ingredient, index) => {
-                if (typeof ingredient !== 'object' || !ingredient.name) {
-                    throw new Error(`Ingredient at index ${index} must be an object with a name property`);
-                }
-            });
-
             meal.ingredients = ingredients;
             await meal.save();
 
-            // Reload with category
-            const updated = await Meal.findByPk(id, {
-                include: [{ model: Category, attributes: ['id', 'name', 'description'] }]
-            });
-            return transformMealResponse(updated);
+            const updated = await Meal.findById(id).populate('categoryId', 'id name description');
+            return transformMeal(updated);
         } catch (error) {
             throw error;
         }
@@ -275,13 +156,55 @@ class MealService {
 
     static async deleteMeal(id) {
         try {
-            const meal = await Meal.findByPk(id);
+            const meal = await Meal.findById(id);
             if (!meal) {
                 throw new Error('Meal not found');
             }
 
-            await meal.destroy();
+            await meal.deleteOne();
+            await Favorite.deleteMany({ mealId: id });
             return { message: 'Meal deleted successfully' };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async updateMeal(id, data) {
+        try {
+            if (data.categoryId) {
+                const category = await Category.findById(data.categoryId);
+                if (!category) {
+                    throw new Error('Category not found');
+                }
+            }
+
+            const meal = await Meal.findByIdAndUpdate(id, data, { new: true }).populate('categoryId', 'id name description');
+            if (!meal) {
+                throw new Error('Meal not found');
+            }
+            return transformMeal(meal);
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    static async searchMeals(query, userId = null) {
+        try {
+            const regex = new RegExp(query, 'i');
+            const meals = await Meal.find({
+                $or: [
+                    { name: regex },
+                    { description: regex }
+                ]
+            }).populate('categoryId', 'id name description');
+
+            let favoriteIds = new Set();
+            if (userId) {
+                const favs = await Favorite.find({ userId, mealId: { $in: meals.map(m => m.id) } }).select('mealId');
+                favoriteIds = new Set(favs.map(f => f.mealId.toString()));
+            }
+
+            return meals.map((m) => transformMeal(m, favoriteIds));
         } catch (error) {
             throw error;
         }

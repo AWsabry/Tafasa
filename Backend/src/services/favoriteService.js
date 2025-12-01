@@ -5,17 +5,12 @@ import Category from '../models/Category.js';
 class FavoriteService {
     static async addFavorite(userId, mealId) {
         try {
-            // Check if meal exists
-            const meal = await Meal.findByPk(mealId);
+            const meal = await Meal.findById(mealId);
             if (!meal) {
                 throw new Error('Meal not found');
             }
 
-            // Check if favorite already exists
-            const existingFavorite = await Favorite.findOne({
-                where: { userId, mealId }
-            });
-
+            const existingFavorite = await Favorite.findOne({ userId, mealId });
             if (existingFavorite) {
                 throw new Error('Meal is already in favorites');
             }
@@ -29,15 +24,13 @@ class FavoriteService {
 
     static async removeFavorite(userId, mealId) {
         try {
-            const favorite = await Favorite.findOne({
-                where: { userId, mealId }
-            });
+            const favorite = await Favorite.findOne({ userId, mealId });
 
             if (!favorite) {
                 throw new Error('Favorite not found');
             }
 
-            await favorite.destroy();
+            await favorite.deleteOne();
             return { message: 'Favorite removed successfully' };
         } catch (error) {
             throw error;
@@ -46,35 +39,26 @@ class FavoriteService {
 
     static async getAllFavorites(userId) {
         try {
-            const favorites = await Favorite.findAll({
-                where: { userId },
-                include: [
-                    {
-                        model: Meal,
-                        attributes: ['id', 'name', 'description', 'price', 'image', 'ingredients', 'preparationSteps', 'categoryId'],
-                        include: [
-                            {
-                                model: Category,
-                                attributes: ['id', 'name']
-                            }
-                        ]
-                    }
-                ]
-            });
+            const favorites = await Favorite.find({ userId })
+                .populate({
+                    path: 'mealId',
+                    populate: { path: 'categoryId', select: 'id name' }
+                });
 
-            // Format the response to include all required meal details
-            const formattedFavorites = favorites.map(favorite => ({
-                id: favorite.id,
-                mealId: favorite.mealId,
-                name: favorite.Meal.name,
-                description: favorite.Meal.description,
-                price: favorite.Meal.price,
-                image: favorite.Meal.image,
-                ingredients: favorite.Meal.ingredients,
-                preparationSteps: favorite.Meal.preparationSteps,
-                categoryId: favorite.Meal.categoryId,
-                category: favorite.Meal.Category
-            }));
+            const formattedFavorites = favorites.map((favorite) => {
+                const meal = favorite.mealId;
+                return {
+                    id: favorite.id,
+                    mealId: meal.id,
+                    name: meal.name,
+                    description: meal.description,
+                    image: meal.image,
+                    ingredients: meal.ingredients,
+                    preparationSteps: meal.preparationSteps,
+                    categoryId: meal.categoryId?.id || meal.categoryId,
+                    category: meal.categoryId
+                };
+            });
 
             return formattedFavorites;
         } catch (error) {

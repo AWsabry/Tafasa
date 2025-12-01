@@ -1,29 +1,17 @@
 import jwt from 'jsonwebtoken';
-import { Op } from 'sequelize';
 import User from '../models/User.js';
 
 class AuthService {
-    static async register(username, email, password, phoneNumber, age) {
+    static async register(username, email, password, phoneNumber, age, role) {
         try {
             console.log('AuthService.register called with:', { username, email, phoneNumber, age });
 
-            const whereConditions = [
-                { username },
-                { phoneNumber }
-            ];
+            const conditions = [{ username }, { phoneNumber }];
+            if (email) conditions.push({ email });
 
-            // Only check email if it's provided
-            if (email) {
-                whereConditions.push({ email });
-            }
+            console.log('Checking for existing user with conditions:', conditions);
 
-            console.log('Checking for existing user with conditions:', whereConditions);
-
-            const existingUser = await User.findOne({
-                where: {
-                    [Op.or]: whereConditions
-                }
-            });
+            const existingUser = await User.findOne({ $or: conditions });
 
             if (existingUser) {
                 console.log('Existing user found:', existingUser.username);
@@ -38,47 +26,41 @@ class AuthService {
                 }
             }
 
+            // Default all registrations to regular user; admin must be set manually
+            const normalizedRole = 'user';
+
             console.log('Creating new user...');
             const user = await User.create({
                 username,
                 email,
                 password,
                 phoneNumber,
-                age
+                age,
+                role: normalizedRole
             });
 
             console.log('User created successfully:', user.id);
-            const token = this.generateToken(user.id);
+            const token = this.generateToken(user.id, user.role);
             return { user, token };
         } catch (error) {
             console.error('AuthService.register error:', error.message);
             console.error('Error name:', error.name);
             console.error('Full error:', JSON.stringify(error, null, 2));
-            if (error.errors && error.errors.length > 0) {
-                console.error('Validation errors:', error.errors.map(e => ({
-                    field: e.path,
-                    message: e.message,
-                    value: e.value
-                })));
-            }
             throw error;
         }
     }
 
     static async login(email, phone, password) {
         try {
-            // Build the where condition based on what was provided
-            const whereCondition = {};
-
-            if (email) {
-                whereCondition.email = email;
-            } else if (phone) {
-                whereCondition.phoneNumber = phone;
-            }
-
-            const user = await User.findOne({ where: whereCondition });
+            const whereCondition = email ? { email } : { phoneNumber: phone };
+            const user = await User.findOne(whereCondition);
             if (!user) {
                 throw new Error('User not found');
+            }
+
+            if (user.role !== 'admin') { 
+                console.log(user.role);
+                throw new Error('Only admin users can sign in');
             }
 
             const isMatch = await user.comparePassword(password);
@@ -86,16 +68,16 @@ class AuthService {
                 throw new Error('Invalid credentials');
             }
 
-            const token = this.generateToken(user.id);
+            const token = this.generateToken(user.id, user.role);
             return { user, token };
         } catch (error) {
             throw error;
         }
     }
 
-    static generateToken(userId) {
+    static generateToken(userId, role) {
         return jwt.sign(
-            { userId },
+            { userId, role },
             process.env.JWT_SECRET,
             { expiresIn: '24h' }
         );
@@ -103,10 +85,9 @@ class AuthService {
 
     static async getAllUsers() {
         try {
-            const users = await User.findAll({
-                attributes: ['id', 'username', 'email', 'phoneNumber', 'age', 'createdAt'],
-                order: [['createdAt', 'DESC']]
-            });
+            const users = await User.find()
+                .select('username email phoneNumber age role createdAt')
+                .sort({ createdAt: -1 });
             return users;
         } catch (error) {
             throw error;
@@ -115,9 +96,7 @@ class AuthService {
 
     static async getUserById(id) {
         try {
-            const user = await User.findByPk(id, {
-                attributes: ['id', 'username', 'email', 'phoneNumber', 'age', 'createdAt']
-            });
+            const user = await User.findById(id).select('username email phoneNumber age role createdAt');
             
             if (!user) {
                 throw new Error('User not found');
@@ -131,17 +110,38 @@ class AuthService {
 
     static async deleteUser(id) {
         try {
-            const user = await User.findByPk(id);
+            const user = await User.findById(id);
             
             if (!user) {
                 throw new Error('User not found');
             }
 
-            await user.destroy();
+            await user.deleteOne();
             return { message: 'User deleted successfully' };
         } catch (error) {
             throw error;
         }
+    }
+
+    static async updateUserRole(id, role) {
+        if (!['admin', 'user'].includes(role)) {
+            throw new Error('Invalid role');
+        }
+        const user = await User.findById(id);
+        if (!user) {
+            throw new Error('User not found');
+        }
+        user.role = role;
+        await user.save();
+        return {
+            id: user.id,
+            username: user.username,
+            email: user.email,
+            phoneNumber: user.phoneNumber,
+            age: user.age,
+            role: user.role,
+            createdAt: user.createdAt
+        };
     }
 }
 

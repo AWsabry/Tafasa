@@ -3,7 +3,7 @@ import AuthController from '../controllers/authController.js';
 import CategoryController from '../controllers/categoryController.js';
 import MealController from '../controllers/mealController.js';
 import FavoriteController from '../controllers/favoriteController.js';
-import auth from '../middleware/auth.js';
+import auth, { requireAdmin } from '../middleware/auth.js';
 import { apiLimiter, authLimiter } from '../middleware/rateLimiter.js';
 import { validate, validateCategory, validateMeal, validateRegistration } from '../middleware/validation.js';
 import upload from '../middleware/upload.js';
@@ -24,11 +24,12 @@ router.post('/auth/login', authLimiter, AuthController.login);
 router.post('/auth/logout', auth, AuthController.logout);
 
 // User routes (protected by auth)
-router.get('/users', auth, AuthController.getAllUsers);
+router.get('/users', auth, requireAdmin, AuthController.getAllUsers);
 // Current authenticated user
 router.get('/users/me', auth, AuthController.getCurrentUser);
-router.get('/users/:id', auth, AuthController.getUserById);
-router.delete('/users/:id', auth, AuthController.deleteUser);
+router.get('/users/:id', auth, requireAdmin, AuthController.getUserById);
+router.patch('/users/:id/role', auth, requireAdmin, AuthController.updateUserRole);
+router.delete('/users/:id', auth, requireAdmin, AuthController.deleteUser);
 
 // Category routes
 router.post('/categories', auth, validateCategory, validate, CategoryController.createCategory);
@@ -50,12 +51,15 @@ router.get('/categories/:categoryId/recommended', auth, MealController.getRecomm
 
 // Meal routes
 router.post('/meals', auth, validateMeal, validate, MealController.createMeal);
+router.put('/meals/:id', auth, validateMeal, validate, MealController.updateMeal);
 
 // Bulk upload meals via Excel
 router.post('/meals/upload', auth, upload.single('file'), MealController.uploadMealsFromExcel);
 
 // Get all meals
 router.get('/meals', auth, MealController.getAllMeals);
+// Search meals
+router.get('/meals/search', auth, MealController.searchMeals);
 
 // Recommended meal (random) - MUST be before /meals/:id
 router.get('/meals/recommended', auth, MealController.getRecommendedMeal);

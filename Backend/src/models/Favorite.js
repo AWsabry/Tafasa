@@ -1,47 +1,21 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database.js';
-import User from './User.js';
-import Meal from './Meal.js';
+import mongoose from 'mongoose';
 
-class Favorite extends Model {}
-
-Favorite.init({
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    userId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: User,
-            key: 'id'
-        }
-    },
-    mealId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Meal,
-            key: 'id'
+const favoriteSchema = new mongoose.Schema({
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+    mealId: { type: mongoose.Schema.Types.ObjectId, ref: 'Meal', required: true }
+}, {
+    timestamps: true,
+    toJSON: {
+        transform: (_, ret) => {
+            ret.id = ret._id.toString();
+            delete ret._id;
+            delete ret.__v;
+            return ret;
         }
     }
-}, {
-    sequelize,
-    modelName: 'Favorite',
-    indexes: [
-        {
-            unique: true,
-            fields: ['userId', 'mealId'] // Prevent duplicate favorites
-        }
-    ]
 });
 
-// Set up relationships
-Favorite.belongsTo(User, { foreignKey: 'userId' });
-Favorite.belongsTo(Meal, { foreignKey: 'mealId' });
-User.hasMany(Favorite, { foreignKey: 'userId' });
-Meal.hasMany(Favorite, { foreignKey: 'mealId' });
+favoriteSchema.index({ userId: 1, mealId: 1 }, { unique: true });
 
+const Favorite = mongoose.model('Favorite', favoriteSchema);
 export default Favorite;

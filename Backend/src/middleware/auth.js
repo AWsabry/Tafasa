@@ -10,7 +10,7 @@ const auth = async (req, res, next) => {
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        const user = await User.findOne({ where: { id: decoded.userId } });
+        const user = await User.findById(decoded.userId);
 
         if (!user) {
             throw new Error();
@@ -22,6 +22,13 @@ const auth = async (req, res, next) => {
     } catch (error) {
         res.status(401).json({ error: 'Please authenticate.' });
     }
+};
+
+export const requireAdmin = (req, res, next) => {
+    if (!req.user || req.user.role !== 'admin') {
+        return res.status(403).json({ error: 'Admin access required.' });
+    }
+    next();
 };
 
 export default auth;

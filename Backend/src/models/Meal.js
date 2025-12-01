@@ -1,90 +1,34 @@
-import { DataTypes, Model } from 'sequelize';
-import sequelize from '../config/database.js';
-import Category from './Category.js';
+import mongoose from 'mongoose';
 
-class Meal extends Model {}
+const ingredientSchema = new mongoose.Schema({
+    name: { type: String, required: true },
+    amount: { type: Number },
+    unit: { type: String }
+}, { _id: false });
 
-Meal.init({
-    id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-            notEmpty: true
-        }
-    },
-    description: {
-        type: DataTypes.TEXT,
-        allowNull: true
-    },
-    price: {
-        type: DataTypes.DECIMAL(10, 2),
-        allowNull: false,
-        validate: {
-            min: 0
-        }
-    },
-    image: {
-        type: DataTypes.STRING,
-        allowNull: true
-    },
-    ingredients: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: [],
-        validate: {
-            isValidIngredientsList(value) {
-                if (!Array.isArray(value)) {
-                    throw new Error('Ingredients must be an array');
-                }
-                value.forEach(ingredient => {
-                    if (typeof ingredient !== 'object' || !ingredient.name) {
-                        throw new Error('Each ingredient must have a name');
-                    }
-                    // amount and unit are optional
-                });
-            }
-        }
-    },
-    preparationSteps: {
-        type: DataTypes.JSON,
-        allowNull: false,
-        defaultValue: [],
-        validate: {
-            isValidStepsList(value) {
-                if (!Array.isArray(value)) {
-                    throw new Error('Preparation steps must be an array');
-                }
-                value.forEach((step, index) => {
-                    if (typeof step !== 'object' || !step.step || !step.description) {
-                        throw new Error('Each step must have step number and description');
-                    }
-                    if (step.step !== index + 1) {
-                        throw new Error('Steps must be properly numbered in sequence');
-                    }
-                });
-            }
-        }
-    },
-    categoryId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        references: {
-            model: Category,
-            key: 'id'
+const stepSchema = new mongoose.Schema({
+    step: { type: Number, required: true },
+    description: { type: String, required: true }
+}, { _id: false });
+
+const mealSchema = new mongoose.Schema({
+    name: { type: String, required: true, trim: true },
+    description: { type: String },
+    image: { type: String },
+    ingredients: { type: [ingredientSchema], default: [] },
+    preparationSteps: { type: [stepSchema], default: [] },
+    categoryId: { type: mongoose.Schema.Types.ObjectId, ref: 'Category', required: true }
+}, {
+    timestamps: true,
+    toJSON: {
+        transform: (_, ret) => {
+            ret.id = ret._id.toString();
+            delete ret._id;
+            delete ret.__v;
+            return ret;
         }
     }
-}, {
-    sequelize,
-    modelName: 'Meal'
 });
 
-// Set up the relationship
-Meal.belongsTo(Category, { foreignKey: 'categoryId' });
-Category.hasMany(Meal, { foreignKey: 'categoryId' });
-
+const Meal = mongoose.model('Meal', mealSchema);
 export default Meal;

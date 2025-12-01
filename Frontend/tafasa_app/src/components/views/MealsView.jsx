@@ -31,13 +31,16 @@ const MealsView = () => {
   const [uploadError, setUploadError] = useState(null);
   const [uploadSummary, setUploadSummary] = useState(null);
   const [uploadDetails, setUploadDetails] = useState([]);
+  const [editingMeal, setEditingMeal] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [search, setSearch] = useState('');
   const navigate = useNavigate();
   const { token } = useAuth();
 
-  const fetchMeals = async () => {
+  const fetchMeals = async (endpoint = '/meals') => {
     setLoading(true);
     try {
-      const data = await api.get('/meals');
+      const data = await api.get(endpoint);
       const list = Array.isArray(data) ? data : (data?.meals || []);
       setMeals(list);
       setError(null);
@@ -60,6 +63,15 @@ const MealsView = () => {
     }
     return () => { mounted = false; };
   }, []);
+
+  const handleSearch = () => {
+    const term = search.trim();
+    if (term) {
+      fetchMeals(`/meals/search?query=${encodeURIComponent(term)}`);
+    } else {
+      fetchMeals();
+    }
+  };
 
   const handleDeleteMeal = async (mealId) => {
     if (!window.confirm('Are you sure you want to delete this meal?')) {
@@ -87,6 +99,31 @@ const MealsView = () => {
     } catch (err) {
       const msg = err?.message || 'Failed to create meal';
       setError(msg);
+    }
+  };
+
+  const handleEditMeal = async (formData) => {
+    if (!editingMeal) return;
+    try {
+      await api.put(`/meals/${editingMeal.id}`, formData);
+      await fetchMeals();
+      setIsEditModalOpen(false);
+      setEditingMeal(null);
+    } catch (err) {
+      const msg = err?.message || 'Failed to update meal';
+      setError(msg);
+    }
+  };
+
+  const handleBulkDeleteMeals = async (ids) => {
+    if (!ids || ids.length === 0) return;
+    if (!window.confirm(`Delete ${ids.length} meal(s)? This cannot be undone.`)) return;
+    try {
+      await Promise.all(ids.map((id) => api.delete(`/meals/${id}`)));
+      await fetchMeals();
+    } catch (err) {
+      const msg = err?.message || 'Failed to delete selected meals';
+      alert(msg);
     }
   };
 
@@ -142,7 +179,23 @@ const MealsView = () => {
 
   return (
     <>
-      <div className="flex flex-wrap justify-end gap-3 mb-4">
+      <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search meals..."
+            className="input px-3 py-2 text-sm"
+          />
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="btn btn-primary btn-compact"
+          >
+            Search
+          </button>
+        </div>
         <button
           onClick={() => {
             setIsUploadModalOpen(true);
@@ -171,7 +224,16 @@ const MealsView = () => {
         </button>
       </div>
 
-      <MealsTable meals={meals} onDelete={handleDeleteMeal} />
+      <MealsTable
+        meals={meals}
+        onDelete={handleDeleteMeal}
+        onBulkDelete={handleBulkDeleteMeals}
+        onEdit={(meal) => {
+          setEditingMeal(meal);
+          setIsEditModalOpen(true);
+          setError(null);
+        }}
+      />
 
       <Modal isOpen={isModalOpen} onClose={() => {
         setIsModalOpen(false);
@@ -269,6 +331,28 @@ const MealsView = () => {
             </button>
           </div>
         </form>
+      </Modal>
+
+      <Modal isOpen={isEditModalOpen} onClose={() => {
+        setIsEditModalOpen(false);
+        setEditingMeal(null);
+        setError(null);
+      }}>
+        <div className="mb-4">
+          <h2 className="text-lg font-semibold">Edit Meal</h2>
+          <p className="text-sm text-[var(--color-text-secondary)]">Update meal details</p>
+        </div>
+        {editingMeal && (
+          <MealForm
+            initialData={editingMeal}
+            onSubmit={handleEditMeal}
+            onCancel={() => {
+              setIsEditModalOpen(false);
+              setEditingMeal(null);
+              setError(null);
+            }}
+          />
+        )}
       </Modal>
     </>
   );

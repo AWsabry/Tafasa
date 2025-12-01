@@ -55,6 +55,16 @@ const UsersView = () => {
     }
   };
 
+  const handleRoleChange = async (userId, role) => {
+    try {
+      await api.patch(`/users/${userId}/role`, { role });
+      await fetchUsers();
+    } catch (err) {
+      const msg = err?.message || 'Failed to update role';
+      alert(msg);
+    }
+  };
+
   if (loading) return (
     <div className="flex items-center justify-center py-12">
       <div className="animate-spin rounded-full h-10 w-10 border-4 border-[var(--color-primary)] border-t-transparent"></div>
@@ -67,7 +77,7 @@ const UsersView = () => {
     </div>
   );
 
-  return <UsersTable users={users} onDelete={handleDeleteUser} />;
+  return <UsersTable users={users} onDelete={handleDeleteUser} onRoleChange={handleRoleChange} />;
 };
 
 export default UsersView;

@@ -5,7 +5,6 @@ const MealForm = ({ onSubmit, onCancel, initialData = {} }) => {
   const [formData, setFormData] = useState({
     name: initialData.name || '',
     description: initialData.description || '',
-    price: initialData.price || '',
     image: initialData.image || '',
     categoryId: initialData.categoryId?.id || initialData.categoryId || '',
     ingredients: initialData.ingredients || [],
@@ -100,10 +99,6 @@ const MealForm = ({ onSubmit, onCancel, initialData = {} }) => {
       setError('Meal name is required');
       return;
     }
-    if (!formData.price || Number(formData.price) <= 0) {
-      setError('Valid price is required');
-      return;
-    }
     if (!formData.categoryId) {
       setError('Category is required');
       return;
@@ -115,8 +110,7 @@ const MealForm = ({ onSubmit, onCancel, initialData = {} }) => {
 
     onSubmit({
       ...formData,
-      price: Number(formData.price),
-      categoryId: Number(formData.categoryId)
+      categoryId: formData.categoryId
     });
   };
 
@@ -137,40 +131,20 @@ const MealForm = ({ onSubmit, onCancel, initialData = {} }) => {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
-            Name <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="text"
-            id="name"
-            name="name"
-            value={formData.name}
-            onChange={handleChange}
-            className="block w-full rounded-lg bg-[var(--color-bg-tertiary)] border-transparent px-4 py-2.5 text-[var(--color-text-primary)]"
-            placeholder="Enter meal name"
-            required
-          />
-        </div>
-
-        <div>
-          <label htmlFor="price" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
-            Price <span className="text-red-400">*</span>
-          </label>
-          <input
-            type="number"
-            id="price"
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            className="block w-full rounded-lg bg-[var(--color-bg-tertiary)] border-transparent px-4 py-2.5 text-[var(--color-text-primary)]"
-            placeholder="0.00"
-            step="0.01"
-            min="0"
-            required
-          />
-        </div>
+      <div>
+        <label htmlFor="name" className="block text-sm font-medium text-[var(--color-text-secondary)] mb-1">
+          Name <span className="text-red-400">*</span>
+        </label>
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value={formData.name}
+          onChange={handleChange}
+          className="block w-full rounded-lg bg-[var(--color-bg-tertiary)] border-transparent px-4 py-2.5 text-[var(--color-text-primary)]"
+          placeholder="Enter meal name"
+          required
+        />
       </div>
 
       <div>
