@@ -44,7 +44,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 
   @override
-  Future<Either<Failure, void>> addFavorite(int mealId) async {
+  Future<Either<Failure, void>> addFavorite(String mealId) async {
     try {
       await _favoritesDatasource.addFavorite(mealId);
       Logger.log('✅ Favorite added successfully');
@@ -61,7 +61,7 @@ class FavoritesRepositoryImpl implements FavoritesRepository {
   }
 
   @override
-  Future<Either<Failure, void>> removeFavorite(int mealId) async {
+  Future<Either<Failure, void>> removeFavorite(String mealId) async {
     try {
       await _favoritesDatasource.removeFavorite(mealId);
       Logger.log('✅ Favorite removed successfully');

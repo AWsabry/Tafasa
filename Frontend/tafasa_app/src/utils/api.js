@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = 'http://192.168.137.1:5000';
 
 // List of endpoints that don't require authentication
 const PUBLIC_ENDPOINTS = ['/auth/login', '/auth/register'];

@@ -5,7 +5,7 @@ import 'package:tafasa/features/recipe_detail/presentation/controller/recipe_det
 import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
 
 class RecipeDetailScreen extends StatelessWidget {
-  final int mealId;
+  final String mealId;
   final Color categoryColor;
   final IconData categoryIcon;
 
@@ -177,20 +177,27 @@ class _RecipeDetailScreenViewState extends State<_RecipeDetailScreenView>
                     expandedHeight: 300,
                     pinned: true,
                     backgroundColor: widget.categoryColor,
-                    leading: Container(
-                      margin: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.9),
-                        shape: BoxShape.circle,
-                      ),
-                      child: IconButton(
-                        icon: Icon(
-                          Icons.arrow_forward_rounded,
-                          color: widget.categoryColor,
+                    automaticallyImplyLeading: false,
+                    leading: null,
+                    actions: [
+                      Directionality(
+                        textDirection: TextDirection.ltr,
+                        child: Container(
+                          margin: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.9),
+                            shape: BoxShape.circle,
+                          ),
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.arrow_back_rounded,
+                              color: widget.categoryColor,
+                            ),
+                            onPressed: () => Navigator.pop(context),
+                          ),
                         ),
-                        onPressed: () => Navigator.pop(context),
                       ),
-                    ),
+                    ],
                     flexibleSpace: FlexibleSpaceBar(
                       background: Stack(
                         fit: StackFit.expand,
@@ -247,6 +254,12 @@ class _RecipeDetailScreenViewState extends State<_RecipeDetailScreenView>
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
+                                        const Icon(
+                                          Icons.arrow_forward_rounded,
+                                          color: Colors.white,
+                                          size: 14,
+                                        ),
+                                        const SizedBox(width: 6),
                                         Icon(
                                           widget.categoryIcon,
                                           color: Colors.white,
@@ -353,7 +366,7 @@ class _RecipeDetailScreenViewState extends State<_RecipeDetailScreenView>
                             // Completion Message
                             if (_completedSteps.length == steps.length &&
                                 steps.isNotEmpty)
-                              _buildCompletionCard(),
+                              Center(child: _buildCompletionCard()),
                           ],
                         ),
                       ),

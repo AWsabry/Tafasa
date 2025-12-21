@@ -46,6 +46,7 @@ class _SuggestionScreenState extends State<SuggestionScreen>
   // Swipe variables
   double _dragDistance = 0;
   bool _isSwipeInProgress = false;
+  bool _isLoadingNewMeal = false;
 
   @override
   void initState() {
@@ -205,18 +206,14 @@ class _SuggestionScreenState extends State<SuggestionScreen>
   }
 
   void suggestAgain() {
-    if (_isSwipeInProgress) return;
+    if (_isSwipeInProgress || _isLoadingNewMeal) return;
 
-    _controller.reverse().then((_) {
-      _descriptionController.reverse().then((_) {
-        // Trigger new meal fetch from Cubit
-        context.read<SuggestionsCubit>().suggestNewMeal(currentMeal["name"]);
-        _controller.forward();
-        Future.delayed(const Duration(milliseconds: 200), () {
-          _descriptionController.forward();
-        });
-      });
+    setState(() {
+      _isLoadingNewMeal = true;
     });
+
+    // Trigger new meal fetch from Cubit
+    context.read<SuggestionsCubit>().suggestNewMeal(currentMeal["name"]);
   }
 
   void toggleFavorite() async {
@@ -417,11 +414,25 @@ class _SuggestionScreenState extends State<SuggestionScreen>
             currentCategory = state.currentCategory;
             _isFavorite = state.recipe?.isFavorite ?? false;
             currentRecipe = state.recipe;
+            _isLoadingNewMeal = false;
+          });
+          // Animate the new content in
+          _controller.reset();
+          _descriptionController.reset();
+          _controller.forward();
+          Future.delayed(const Duration(milliseconds: 200), () {
+            _descriptionController.forward();
+          });
+        } else if (state is SuggestionsLoading && currentMeal.isNotEmpty) {
+          // Keep loading state but don't rebuild everything
+          setState(() {
+            _isLoadingNewMeal = true;
           });
         }
       },
       builder: (context, state) {
-        if (state is SuggestionsLoading) {
+        // Show full loading screen only on initial load
+        if (state is SuggestionsLoading && currentMeal.isEmpty) {
           return Directionality(
             textDirection: TextDirection.rtl,
             child: Scaffold(
@@ -435,7 +446,8 @@ class _SuggestionScreenState extends State<SuggestionScreen>
           );
         }
 
-        if (state is SuggestionsError) {
+        // Show error screen only if we don't have existing content
+        if (state is SuggestionsError && currentMeal.isEmpty) {
           return Directionality(
             textDirection: TextDirection.rtl,
             child: Scaffold(
@@ -476,7 +488,8 @@ class _SuggestionScreenState extends State<SuggestionScreen>
           );
         }
 
-        if (state is! SuggestionsLoaded) {
+        // If we have no loaded state and no existing content, show nothing
+        if (state is! SuggestionsLoaded && currentMeal.isEmpty) {
           return const SizedBox();
         }
 
@@ -504,6 +517,17 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                     AppTheme.primaryOrange.withOpacity(0.2),
                   ),
 
+                  // Loading overlay when fetching new meal
+                  if (_isLoadingNewMeal)
+                    Container(
+                      color: Colors.white.withOpacity(0.7),
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: getCategoryColor(),
+                        ),
+                      ),
+                    ),
+
                   Column(
                     children: [
                       // Custom App Bar - Clean white style
@@ -522,64 +546,66 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                             ),
                           ],
                         ),
-                        child: Row(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[100],
-                                borderRadius: BorderRadius.circular(12),
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Row(
+                            children: [
+                              Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: IconButton(
+                                  icon: const Icon(Icons.arrow_back_rounded),
+                                  color: Colors.grey[700],
+                                  onPressed: () => Navigator.pop(context),
+                                ),
                               ),
-                              child: IconButton(
-                                icon: const Icon(Icons.arrow_forward_rounded),
-                                color: Colors.grey[700],
-                                onPressed: () => Navigator.pop(context),
+                              Expanded(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: getCategoryColor().withOpacity(0.1),
+                                      ),
+                                      child: Icon(
+                                        getCategoryIcon(),
+                                        color: getCategoryColor(),
+                                        size: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'اقتراح $currentCategory',
+                                      style: TextStyle(
+                                        fontFamily: 'FFKhallab',
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[800],
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    AnimatedBuilder(
+                                      animation: _sparkleController,
+                                      builder: (context, child) {
+                                        return Transform.rotate(
+                                          angle: _sparkleController.value * 2 * pi,
+                                          child: Icon(
+                                            Icons.auto_awesome,
+                                            color: getCategoryColor(),
+                                            size: 20,
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ),
-                            Expanded(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.all(8),
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: getCategoryColor().withOpacity(0.1),
-                                    ),
-                                    child: Icon(
-                                      getCategoryIcon(),
-                                      color: getCategoryColor(),
-                                      size: 24,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    'اقتراح $currentCategory',
-                                    style: TextStyle(
-                                      fontFamily: 'FFKhallab',
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[800],
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  AnimatedBuilder(
-                                    animation: _sparkleController,
-                                    builder: (context, child) {
-                                      return Transform.rotate(
-                                        angle: _sparkleController.value * 2 * pi,
-                                        child: Icon(
-                                          Icons.auto_awesome,
-                                          color: getCategoryColor(),
-                                          size: 20,
-                                        ),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                            ),
-                            const SizedBox(width: 48),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
 
@@ -938,8 +964,14 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                                     horizontal: 20,
                                                                   ),
                                                                   child: Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.center,
+                                                                    mainAxisAlignment: MainAxisAlignment.start,
                                                                     children: const [
+                                                                      Icon(
+                                                                        Icons.arrow_forward_rounded,
+                                                                        color: Colors.white,
+                                                                        size: 18,
+                                                                      ),
+                                                                      SizedBox(width: 10),
                                                                       Icon(
                                                                         Icons.menu_book_rounded,
                                                                         color: Colors.white,
@@ -954,11 +986,6 @@ class _SuggestionScreenState extends State<SuggestionScreen>
                                                                           fontSize: 14,
                                                                           fontWeight: FontWeight.bold,
                                                                         ),
-                                                                      ),
-                                                                      Icon(
-                                                                        Icons.arrow_back_rounded,
-                                                                        color: Colors.white,
-                                                                        size: 18,
                                                                       ),
                                                                     ],
                                                                   ),

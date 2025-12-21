@@ -101,7 +101,7 @@ class ServiceLocator {
     sl.registerFactory<HomeCubit>(
       () => HomeCubit(sl<GetCategoriesRepository>()),
     );
-    sl.registerFactoryParam<SuggestionsCubit, int?, void>(
+    sl.registerFactoryParam<SuggestionsCubit, String?, void>(
       (categoryId, _) =>
           SuggestionsCubit(sl<SuggestionsRepository>(), categoryId: categoryId),
     );

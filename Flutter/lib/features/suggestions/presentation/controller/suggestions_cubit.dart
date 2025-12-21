@@ -8,9 +8,9 @@ part 'suggestions_state.dart';
 
 class SuggestionsCubit extends Cubit<SuggestionsState> {
   final SuggestionsRepository _suggestionsRepository;
-  final int? _initialCategoryId;
+  final String? _initialCategoryId;
 
-  SuggestionsCubit(this._suggestionsRepository, {int? categoryId})
+  SuggestionsCubit(this._suggestionsRepository, {String? categoryId})
     : _initialCategoryId = categoryId,
       super(const SuggestionsInitial()) {
     Logger.debug((categoryId ?? null).toString());

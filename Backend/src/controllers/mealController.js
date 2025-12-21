@@ -24,10 +24,17 @@ const parseIngredients = (value) => {
             .map((item) => {
                 if (typeof item === 'string') {
                     const parts = item.split('|').map(part => part.trim());
+                    let amount = undefined;
+                    if (parts[1] && parts[1] !== '') {
+                        const numValue = Number(parts[1]);
+                        amount = !isNaN(numValue) ? numValue : undefined;
+                    }
+                    // If amount is empty but unit is in the amount position, shift it
+                    const unit = parts[2] || (parts[1] && isNaN(Number(parts[1])) && parts[1] !== '' ? parts[1] : undefined);
                     return {
                         name: parts[0],
-                        amount: parts[1] ? Number(parts[1]) : undefined,
-                        unit: parts[2] || undefined
+                        amount: amount,
+                        unit: unit
                     };
                 }
                 return item;
@@ -37,10 +44,17 @@ const parseIngredients = (value) => {
     const segments = String(value).split(';').map(segment => segment.trim()).filter(Boolean);
     return segments.map((segment) => {
         const parts = segment.split('|').map(part => part.trim());
+        let amount = undefined;
+        if (parts[1] && parts[1] !== '') {
+            const numValue = Number(parts[1]);
+            amount = !isNaN(numValue) ? numValue : undefined;
+        }
+        // If amount is empty but unit is in the amount position, shift it
+        const unit = parts[2] || (parts[1] && isNaN(Number(parts[1])) && parts[1] !== '' ? parts[1] : undefined);
         return {
             name: parts[0],
-            amount: parts[1] ? Number(parts[1]) : undefined,
-            unit: parts[2] || undefined
+            amount: amount,
+            unit: unit
         };
     });
 };

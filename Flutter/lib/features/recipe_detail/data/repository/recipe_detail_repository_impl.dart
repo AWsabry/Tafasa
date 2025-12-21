@@ -13,7 +13,7 @@ class RecipeDetailRepositoryImpl implements RecipeDetailRepository {
   RecipeDetailRepositoryImpl(this._datasource);
 
   @override
-  Future<Either<Failure, RecipeModel>> getRecipeById(int recipeId) async {
+  Future<Either<Failure, RecipeModel>> getRecipeById(String recipeId) async {
     try {
       final response = await _datasource.getRecipeById(recipeId);
       Logger.debug(response.data.toString());

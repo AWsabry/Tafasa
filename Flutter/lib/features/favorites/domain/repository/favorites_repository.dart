@@ -4,6 +4,6 @@ import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
 
 abstract class FavoritesRepository {
   Future<Either<Failure, List<RecipeModel>>> getAllFavorites();
-  Future<Either<Failure, void>> addFavorite(int mealId);
-  Future<Either<Failure, void>> removeFavorite(int mealId);
+  Future<Either<Failure, void>> addFavorite(String mealId);
+  Future<Either<Failure, void>> removeFavorite(String mealId);
 }

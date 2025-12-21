@@ -14,7 +14,7 @@ class SuggestionsRepositoryImpl implements SuggestionsRepository {
 
   @override
   Future<Either<Failure, SuggestionsResponse>> getSuggestions({
-    int? categoryId,
+    String? categoryId,
   }) async {
     try {
       final response = await _datasource.getSuggestions(categoryId: categoryId);
@@ -27,7 +27,7 @@ class SuggestionsRepositoryImpl implements SuggestionsRepository {
 
   @override
   Future<Either<Failure, RecipeModel>> getRandomSuggestion({
-    int? categoryId,
+    String? categoryId,
   }) async {
     try {
       final response = await _datasource.getRandomSuggestion(

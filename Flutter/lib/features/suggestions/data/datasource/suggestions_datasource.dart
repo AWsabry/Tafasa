@@ -6,7 +6,7 @@ class SuggestionsDatasource {
 
   SuggestionsDatasource(this._dioClient);
 
-  Future<Response> getSuggestions({int? categoryId}) async {
+  Future<Response> getSuggestions({String? categoryId}) async {
     if (categoryId != null) {
       return await _dioClient.get("/categories/$categoryId/recommended");
     } else {
@@ -14,7 +14,7 @@ class SuggestionsDatasource {
     }
   }
 
-  Future<Response> getRandomSuggestion({int? categoryId}) async {
+  Future<Response> getRandomSuggestion({String? categoryId}) async {
     if (categoryId != null) {
       return await _dioClient.get("/categories/$categoryId/recommended");
     } else {

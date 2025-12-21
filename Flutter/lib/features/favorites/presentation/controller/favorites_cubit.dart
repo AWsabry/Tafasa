@@ -41,7 +41,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     }
   }
 
-  Future<void> removeFavorite(int mealId) async {
+  Future<void> removeFavorite(String mealId) async {
     final currentState = state;
     if (currentState is FavoritesLoaded) {
       final result = await _favoritesRepository.removeFavorite(mealId);
@@ -55,7 +55,7 @@ class FavoritesCubit extends Cubit<FavoritesState> {
     }
   }
 
-  Future<void> addFavorite(int mealId) async {
+  Future<void> addFavorite(String mealId) async {
     final result = await _favoritesRepository.addFavorite(mealId);
     result.fold(
       (failure) => emit(FavoritesError(failure.message)),

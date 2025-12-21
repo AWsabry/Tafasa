@@ -256,15 +256,25 @@ const MealsView = () => {
         <div className="mb-4">
           <h2 className="text-lg font-semibold">Upload Meals from Excel</h2>
           <p className="text-sm text-[var(--color-text-secondary)]">
-            Upload an Excel file (.xlsx or .xls) using the provided template. Ingredients can be separated with <code>|</code> and rows separated with <code>;</code>.
+            Upload an Excel file (.xlsx, .xls, or .csv) using the provided template. Use <strong>CategoryName</strong> (Arabic) instead of CategoryId. Ingredients format: <code>name|amount|unit;name|amount|unit</code>. Steps format: <code>step1;step2;step3</code>.
           </p>
-          <a
-            href="/samples/meals_upload_template.xls"
-            download
-            className="text-sm text-[var(--color-primary)] hover:underline"
-          >
-            Download sample template
-          </a>
+          <div className="flex gap-3 mt-2">
+            <a
+              href="/samples/meal_upload_template.csv"
+              download
+              className="text-sm text-[var(--color-primary)] hover:underline"
+            >
+              Download CSV template
+            </a>
+            <span className="text-sm text-[var(--color-text-secondary)]">|</span>
+            <a
+              href="/samples/meal_upload_template.xlsx"
+              download
+              className="text-sm text-[var(--color-primary)] hover:underline"
+            >
+              Download Excel template
+            </a>
+          </div>
         </div>
 
         <form onSubmit={handleUploadSubmit} className="space-y-4">
@@ -279,7 +289,7 @@ const MealsView = () => {
               className="block w-full text-sm text-[var(--color-text-secondary)] file:mr-4 file:rounded file:border-0 file:px-4 file:py-2 file:bg-[var(--color-primary)] file:text-white hover:file:bg-[var(--color-primary-light)]"
             />
             <p className="mt-2 text-xs text-[var(--color-text-secondary)]">
-              Required columns: <strong>Name</strong>, <strong>Price</strong>, and either <strong>CategoryId</strong> or <strong>CategoryName</strong>.
+              Required columns: <strong>Name</strong> and <strong>CategoryName</strong> (use Arabic category names: فطور, غداء, عشاء, حلويات, مشروبات).
             </p>
             <p className="mt-1 text-xs text-[var(--color-text-secondary)]">
               Ingredients format example: <code>Tomato|2|pcs;Olive Oil|1|tbsp</code>. Steps example: <code>Preheat oven;Bake for 20 minutes</code>.

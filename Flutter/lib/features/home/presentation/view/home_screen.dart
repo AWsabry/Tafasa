@@ -269,8 +269,8 @@ class _HomeScreenViewState extends State<_HomeScreenView>
                                       ),
                                       child: SvgPicture.asset(
                                         'assets/icons/TAFASA WHITE LOGO.svg',
-                                        height: 85,
-                                        width: 75,
+                                        height: 65,
+                                        width: 60,
                                         fit: BoxFit.fill,
                                         colorFilter: const ColorFilter.mode(
                                           Colors.white,

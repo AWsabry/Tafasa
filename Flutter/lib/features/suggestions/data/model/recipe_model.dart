@@ -49,8 +49,8 @@ class PreparationStep extends Equatable {
 }
 
 class RecipeModel extends Equatable {
-  final int id;
-  final int? mealId;
+  final String id;
+  final String? mealId;
   final String name;
   final String? description;
   final double price;
@@ -79,18 +79,20 @@ class RecipeModel extends Equatable {
 
   factory RecipeModel.fromJson(Map<String, dynamic> json) {
     return RecipeModel(
-      id: json['id'] as int,
+      id: json['id'] as String,
       mealId: json.containsKey('mealId')
-          ? json['mealId'] as int
+          ? json['mealId'] as String
           : null, // ✅ هنا
       name: json['name'] as String,
       isFavorite: json.containsKey('isFavorite')
           ? json['isFavorite'] as bool
           : null,
       description: json['description'] as String?,
-      price: (json['price'] is int)
-          ? (json['price'] as int).toDouble()
-          : json['price'] as double,
+      price: json['price'] == null
+          ? 0.0
+          : (json['price'] is int)
+              ? (json['price'] as int).toDouble()
+              : (json['price'] as num).toDouble(),
       image: json['image'] as String?,
       ingredients: (json['ingredients'] as List<dynamic>)
           .map((item) => Ingredient.fromJson(item as Map<String, dynamic>))

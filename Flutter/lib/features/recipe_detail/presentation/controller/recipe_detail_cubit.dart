@@ -11,7 +11,7 @@ class RecipeDetailCubit extends Cubit<RecipeDetailState> {
   RecipeDetailCubit(this._recipeDetailRepository)
       : super(const RecipeDetailInitial());
 
-  Future<void> getRecipeDetail(int recipeId) async {
+  Future<void> getRecipeDetail(String recipeId) async {
     emit(RecipeDetailLoading());
     final result = await _recipeDetailRepository.getRecipeById(recipeId);
     result.fold(

@@ -7,7 +7,7 @@ class FavoritesDatasource {
   FavoritesDatasource(this._dioClient);
 
   // Add a meal to favorites
-  Future<Response> addFavorite(int mealId) async {
+  Future<Response> addFavorite(String mealId) async {
     return await _dioClient.post("/favorites", {"mealId": mealId});
   }
 
@@ -17,7 +17,7 @@ class FavoritesDatasource {
   }
 
   // Remove a meal from favorites
-  Future<Response> removeFavorite(int mealId) async {
+  Future<Response> removeFavorite(String mealId) async {
     return await _dioClient.delete("/favorites/$mealId");
   }
 }

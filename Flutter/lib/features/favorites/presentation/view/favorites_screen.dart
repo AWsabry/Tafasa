@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:tafasa/core/services/locator/service_locator.dart';
 import 'package:tafasa/core/theme/app_theme.dart';
+import 'package:tafasa/features/home/data/model/categories_model.dart';
 import 'package:tafasa/features/recipe_detail/presentation/view/recipe_detialed_screen.dart';
 import 'package:tafasa/features/suggestions/data/model/recipe_model.dart';
 
@@ -154,13 +155,12 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                     FadeTransition(
                       opacity: _headerAnimation,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 20,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius: const BorderRadius.only(
-                            bottomLeft: Radius.circular(30),
-                            bottomRight: Radius.circular(30),
-                          ),
                           boxShadow: [
                             BoxShadow(
                               color: Colors.black.withOpacity(0.05),
@@ -169,18 +169,18 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                             ),
                           ],
                         ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(right: 10.0),
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
                           child: Row(
                             children: [
                               Container(
                                 decoration: BoxDecoration(
                                   color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(16),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: IconButton(
-                                  icon: const Icon(Icons.arrow_forward_rounded),
-                                  color: AppTheme.primaryPurple,
+                                  icon: const Icon(Icons.arrow_back_rounded),
+                                  color: Colors.grey[700],
                                   onPressed: () => Navigator.pop(context),
                                 ),
                               ),
@@ -188,14 +188,26 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
+                                    Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.pink.withOpacity(0.1),
+                                      ),
+                                      child: const Icon(
+                                        Icons.favorite_rounded,
+                                        color: Colors.pink,
+                                        size: 24,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
                                     Text(
                                       'وجباتي المفضلة',
                                       style: TextStyle(
                                         fontFamily: 'FFKhallab',
-                                        fontSize: 22,
+                                        fontSize: 20,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.grey[800],
-                                        letterSpacing: 1.2,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
@@ -205,7 +217,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                         vertical: 4,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: AppTheme.primaryPurple,
+                                        color: Colors.pink,
                                         borderRadius: BorderRadius.circular(12),
                                       ),
                                       child: Text(
@@ -214,14 +226,13 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                           fontFamily: 'FFKhallab',
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 16,
+                                          fontSize: 14,
                                         ),
                                       ),
                                     ),
                                   ],
                                 ),
                               ),
-                              const SizedBox(width: 48),
                             ],
                           ),
                         ),
@@ -235,67 +246,47 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                           horizontal: 20,
                           vertical: 12,
                         ),
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              _buildFilterChip(
-                                'الكل',
-                                selectedCategory,
-                                cubit,
-                                Icons.apps_rounded,
-                                Colors.grey.shade700,
+                        child: Builder(
+                          builder: (context) {
+                            // Extract unique categories from favorites based on name
+                            final uniqueCategoryMap = <String, Category>{};
+                            for (var favorite in favorites) {
+                              final categoryName = favorite.categoryId.name;
+                              if (!uniqueCategoryMap.containsKey(categoryName)) {
+                                uniqueCategoryMap[categoryName] = favorite.categoryId;
+                              }
+                            }
+                            final categoriesList = uniqueCategoryMap.values.toList();
+
+                            return SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                children: [
+                                  _buildFilterChip(
+                                    'الكل',
+                                    selectedCategory,
+                                    cubit,
+                                    Icons.apps_rounded,
+                                    Colors.grey.shade700,
+                                  ),
+                                  ...categoriesList.map((category) {
+                                    final categoryColor = _getCategoryColor(category.name);
+                                    final categoryIcon = _getCategoryIcon(category.name);
+                                    return Padding(
+                                      padding: const EdgeInsets.only(left: 8),
+                                      child: _buildFilterChip(
+                                        category.name,
+                                        selectedCategory,
+                                        cubit,
+                                        categoryIcon,
+                                        categoryColor,
+                                      ),
+                                    );
+                                  }),
+                                ],
                               ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'فطور',
-                                selectedCategory,
-                                cubit,
-                                Icons.wb_sunny_rounded,
-                                Colors.orange,
-                              ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'غداء',
-                                selectedCategory,
-                                cubit,
-                                Icons.restaurant_rounded,
-                                Colors.red,
-                              ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'عشاء',
-                                selectedCategory,
-                                cubit,
-                                Icons.nightlight_round,
-                                Colors.purple,
-                              ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'تحلية',
-                                selectedCategory,
-                                cubit,
-                                Icons.cake_rounded,
-                                Colors.pink,
-                              ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'سناكس',
-                                selectedCategory,
-                                cubit,
-                                Icons.cookie_rounded,
-                                Colors.amber,
-                              ),
-                              const SizedBox(width: 8),
-                              _buildFilterChip(
-                                'صحي',
-                                selectedCategory,
-                                cubit,
-                                Icons.eco_rounded,
-                                Colors.green,
-                              ),
-                            ],
-                          ),
+                            );
+                          },
                         ),
                       ),
 
@@ -669,7 +660,7 @@ class _FavoritesScreenViewState extends State<_FavoritesScreenView>
                                           onPressed: () {
                                             Navigator.pop(context);
                                             cubit.removeFavorite(
-                                              meal.mealId ?? 0,
+                                              meal.mealId ?? '',
                                             );
                                           },
                                           child: const Text(

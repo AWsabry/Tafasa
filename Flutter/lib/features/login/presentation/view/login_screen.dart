@@ -276,7 +276,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
 
                         // Back button
                         Align(
-                          alignment: Alignment.centerRight,
+                          alignment: Alignment.centerLeft,
                           child: IconButton(
                             onPressed: () {
                               Navigator.pushReplacement(
@@ -310,7 +310,7 @@ class _LoginScreenViewState extends State<_LoginScreenView>
                               );
                             },
                             icon: Icon(
-                              Icons.arrow_forward_rounded,
+                              Icons.arrow_back_rounded,
                               color: Colors.grey[700],
                               size: 28,
                             ),

@@ -6,7 +6,7 @@ class RecipeDetailDatasource {
 
   RecipeDetailDatasource(this._dioClient);
 
-  Future<Response> getRecipeById(int mealId) async {
+  Future<Response> getRecipeById(String mealId) async {
     return await _dioClient.get("/meals/$mealId");
   }
 }

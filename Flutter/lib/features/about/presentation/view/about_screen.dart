@@ -84,17 +84,6 @@ class _AboutScreenState extends State<AboutScreen>
                       padding: const EdgeInsets.only(right: 10.0),
                       child: Row(
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: IconButton(
-                              icon: const Icon(Icons.arrow_forward_rounded),
-                              color: AppTheme.primaryPurple,
-                              onPressed: () => Navigator.pop(context),
-                            ),
-                          ),
                           Expanded(
                             child: Center(
                               child: Text(
@@ -109,7 +98,17 @@ class _AboutScreenState extends State<AboutScreen>
                               ),
                             ),
                           ),
-                          const SizedBox(width: 48),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: IconButton(
+                              icon: const Icon(Icons.arrow_back_rounded),
+                              color: AppTheme.primaryPurple,
+                              onPressed: () => Navigator.pop(context),
+                            ),
+                          ),
                         ],
                       ),
                     ),
